@@ -1,8 +1,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
-import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock, Share2, Download, X } from 'lucide-react';
+import Modal from '@/Components/Modal';
+import DigitalTicket from '@/Components/Invitation/DigitalTicket';
+import html2canvas from 'html2canvas';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -12,6 +15,79 @@ import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 export default function Show({ event }) {
     const [activeTab, setActiveTab] = useState('settings');
     const [previewKey, setPreviewKey] = useState(0);
+    const [selectedGuest, setSelectedGuest] = useState<any>(null);
+    const [isSharingModalOpen, setIsSharingModalOpen] = useState(false);
+    const ticketRef = useRef<HTMLDivElement>(null);
+
+    const handleOpenSharing = (guest: any) => {
+        setSelectedGuest(guest);
+        setIsSharingModalOpen(true);
+    };
+
+    const handleDownloadTicket = async () => {
+        if (!ticketRef.current) return;
+        try {
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                width: 320,
+                onclone: (clonedDoc) => {
+                    const ticket = clonedDoc.querySelector('[data-ticket="invitation"]');
+                    if (ticket instanceof HTMLElement) {
+                        ticket.style.transform = 'none';
+                        ticket.style.margin = '0';
+                        ticket.style.position = 'relative';
+                    }
+                }
+            });
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = image;
+            link.download = `convite-${selectedGuest.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+            link.click();
+        } catch (error) {
+            console.error("Error generating image:", error);
+        }
+    };
+
+    const handleShareTicket = async () => {
+        if (!ticketRef.current) return;
+        try {
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: "#ffffff",
+                width: 320,
+                onclone: (clonedDoc) => {
+                    const ticket = clonedDoc.querySelector('[data-ticket="invitation"]');
+                    if (ticket instanceof HTMLElement) {
+                        ticket.style.transform = 'none';
+                        ticket.style.margin = '0';
+                        ticket.style.position = 'relative';
+                    }
+                }
+            });
+            
+            canvas.toBlob(async (blob) => {
+                if (!blob) return;
+                const file = new File([blob], 'convite.png', { type: 'image/png' });
+                
+                if (navigator.share) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Convite Individual',
+                        text: `Olá ${selectedGuest.name}, aqui está seu convite para o evento ${event.title}!`,
+                    });
+                } else {
+                    const text = encodeURIComponent(`Olá ${selectedGuest.name}, aqui está seu convite para o evento ${event.title}!`);
+                    window.open(`https://wa.me/${selectedGuest.phone?.replace(/\D/g, '')}?text=${text}`, '_blank');
+                }
+            });
+        } catch (error) {
+            console.error("Error sharing:", error);
+        }
+    };
 
     const { data: designData, setData: setDesignData, post: postDesign, processing: processingDesign, recentlySuccessful: designSuccess } = useForm({
         _method: 'put',
@@ -837,9 +913,18 @@ export default function Show({ event }) {
                                                                     </span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex items-center gap-2 text-stone-300">
-                                                                    <Clock className="w-4 h-4" />
-                                                                    <span className="text-xs font-bold uppercase tracking-wider">Aguardando</span>
+                                                                <div className="flex items-center gap-2">
+                                                                    <div className="flex items-center gap-2 text-stone-300">
+                                                                        <Clock className="w-4 h-4" />
+                                                                        <span className="text-xs font-bold uppercase tracking-wider">Aguardando</span>
+                                                                    </div>
+                                                                    <button 
+                                                                        onClick={() => handleOpenSharing(guest)}
+                                                                        className="ml-auto p-2 text-stone-400 hover:text-stone-900 transition-colors"
+                                                                        title="Compartilhar Convite"
+                                                                    >
+                                                                        <Share2 className="w-4 h-4" />
+                                                                    </button>
                                                                 </div>
                                                             )}
                                                         </td>
@@ -855,6 +940,107 @@ export default function Show({ event }) {
 
                 </div>
             </div>
+
+            <Modal show={isSharingModalOpen} onClose={() => setIsSharingModalOpen(false)} maxWidth="full">
+                <div className="flex flex-col h-screen sm:h-[90vh]">
+                    <div className="p-8 pb-4 flex items-center justify-between border-b border-stone-100 bg-white sticky top-0 z-30">
+                        <div>
+                            <h3 className="font-serif text-3xl text-stone-900">Enviar Convite Individual</h3>
+                            <p className="text-stone-500 text-base">Compartilhe o convite personalizado com {selectedGuest?.name}</p>
+                        </div>
+                        <button onClick={() => setIsSharingModalOpen(false)} className="p-3 text-stone-400 hover:text-stone-600 transition-colors bg-stone-50 rounded-full">
+                            <X className="w-8 h-8" />
+                        </button>
+                    </div>
+
+                    <div className="p-8 overflow-y-auto flex-1 bg-stone-50">
+                        <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                            {/* Left Side: Ticket Preview */}
+                            <div className="flex flex-col items-center">
+                                <p className="text-xs font-bold text-stone-400 uppercase tracking-[0.2em] mb-6">Pré-visualização do Convite</p>
+                                <div className="shadow-2xl rounded-[2.5rem] bg-white p-2">
+                                    <DigitalTicket 
+                                        ref={ticketRef}
+                                        guest={selectedGuest}
+                                        event={event}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Right Side: Actions */}
+                            <div className="space-y-10 py-4">
+                                <section>
+                                    <h4 className="text-stone-900 font-bold mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-stone-900 rounded-full" />
+                                        Ações de Arquivo
+                                    </h4>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <button
+                                            onClick={handleDownloadTicket}
+                                            className="flex flex-col items-center justify-center gap-3 bg-white border-2 border-stone-100 text-stone-700 p-8 rounded-3xl font-bold hover:border-stone-200 transition-all shadow-sm group"
+                                        >
+                                            <div className="w-12 h-12 bg-stone-100 rounded-2xl flex items-center justify-center group-hover:bg-stone-200 transition-colors">
+                                                <Download className="w-6 h-6" />
+                                            </div>
+                                            <span>Baixar Imagem</span>
+                                        </button>
+                                        <button
+                                            onClick={handleShareTicket}
+                                            className="flex flex-col items-center justify-center gap-3 bg-stone-900 text-white p-8 rounded-3xl font-bold hover:bg-stone-800 transition-all shadow-xl shadow-stone-200 group"
+                                        >
+                                            <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
+                                                <Share2 className="w-6 h-6" />
+                                            </div>
+                                            <span>{navigator.share ? 'Compartilhar' : 'WhatsApp'}</span>
+                                        </button>
+                                    </div>
+                                </section>
+
+                                <section>
+                                    <h4 className="text-stone-900 font-bold mb-4 flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-stone-900 rounded-full" />
+                                        Atalhos Rápidos de Envio
+                                    </h4>
+                                    <div className="space-y-3">
+                                        <a 
+                                            href={`https://wa.me/${selectedGuest?.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${selectedGuest?.name}, segue seu convite para ${event.title}: `)}`}
+                                            target="_blank"
+                                            className="flex items-center justify-between p-6 bg-white border border-stone-100 rounded-2xl hover:bg-stone-50 transition-all group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-green-100 text-green-600 rounded-xl flex items-center justify-center">
+                                                    <Share2 className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-stone-800">WhatsApp</p>
+                                                    <p className="text-xs text-stone-400">{selectedGuest?.phone || 'Número não informado'}</p>
+                                                </div>
+                                            </div>
+                                            <ExternalLink className="w-5 h-5 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                                        </a>
+
+                                        <a 
+                                            href={`mailto:${selectedGuest?.email}?subject=${encodeURIComponent(`Seu convite para ${event.title}`)}&body=${encodeURIComponent(`Olá ${selectedGuest?.name}, segue seu convite individual para o evento.`)}`}
+                                            className="flex items-center justify-between p-6 bg-white border border-stone-100 rounded-2xl hover:bg-stone-50 transition-all group"
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-10 h-10 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center">
+                                                    <ExternalLink className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-stone-800">E-mail</p>
+                                                    <p className="text-xs text-stone-400">{selectedGuest?.email || 'E-mail não informado'}</p>
+                                                </div>
+                                            </div>
+                                            <ExternalLink className="w-5 h-5 text-stone-300 group-hover:text-stone-900 transition-colors" />
+                                        </a>
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }
