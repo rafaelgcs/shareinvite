@@ -18,6 +18,9 @@ class Event extends Model
         'title',
         'cover_image',
         'logo',
+        'primary_color',
+        'secondary_color',
+        'animation_type',
         'event_date',
         'status',
     ];

@@ -13,6 +13,9 @@ interface InvitationViewProps {
         cover_image: string | null;
         logo: string | null;
         event_date: string;
+        primary_color?: string;
+        secondary_color?: string;
+        animation_type?: string;
     };
     locations: Array<{
         id: number;
@@ -31,12 +34,21 @@ interface InvitationViewProps {
 
 export default function InvitationView({ event, locations, notices }: InvitationViewProps) {
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
+    const primaryColor = event.primary_color || '#1c1917';
+    const secondaryColor = event.secondary_color || '#fafaf9';
+    const animationType = event.animation_type || 'envelope_3d';
 
     return (
-        <>
+        <div style={{ '--color-primary': primaryColor, '--color-secondary': secondaryColor } as React.CSSProperties}>
             <Head title={`Convite: ${event.title}`} />
             
-            <EnvelopeAnimation>
+            <EnvelopeAnimation 
+                animationType={animationType}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                logo={event.logo}
+                title={event.title}
+            >
                 <NoticeModal notices={notices} />
 
                 {/* Cover Section */}
@@ -76,7 +88,7 @@ export default function InvitationView({ event, locations, notices }: Invitation
                 </section>
 
                 {/* Locations Section */}
-                <section className="py-24 px-4 bg-stone-50">
+                <section className="py-24 px-4" style={{ backgroundColor: 'var(--color-secondary)' }}>
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -84,8 +96,8 @@ export default function InvitationView({ event, locations, notices }: Invitation
                         className="max-w-4xl mx-auto"
                     >
                         <div className="text-center mb-12">
-                            <h2 className="font-serif text-4xl text-stone-900 mb-4">Localização</h2>
-                            <div className="w-12 h-0.5 bg-stone-300 mx-auto" />
+                            <h2 className="font-serif text-4xl mb-4" style={{ color: 'var(--color-primary)' }}>Localização</h2>
+                            <div className="w-12 h-0.5 mx-auto" style={{ backgroundColor: 'var(--color-primary)' }} />
                         </div>
                         
                         <GoogleMapWidget locations={locations} />
@@ -95,8 +107,8 @@ export default function InvitationView({ event, locations, notices }: Invitation
                 {/* RSVP Section */}
                 <section className="py-24 px-4 bg-white relative overflow-hidden">
                     {/* Decorative elements */}
-                    <div className="absolute top-0 left-0 w-64 h-64 bg-stone-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 -translate-x-1/2 -translate-y-1/2" />
-                    <div className="absolute bottom-0 right-0 w-64 h-64 bg-stone-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 translate-x-1/2 translate-y-1/2" />
+                    <div className="absolute top-0 left-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
+                    <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 translate-x-1/2 translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
                     
                     <motion.div 
                         initial={{ opacity: 0, scale: 0.95 }}
@@ -109,10 +121,10 @@ export default function InvitationView({ event, locations, notices }: Invitation
                 </section>
 
                 {/* Footer */}
-                <footer className="py-12 bg-stone-900 text-center text-stone-400 text-sm">
+                <footer className="py-12 text-center text-white/50 text-sm" style={{ backgroundColor: 'var(--color-primary)' }}>
                     <p>Feito com ❤️ pela plataforma ShareInvite.</p>
                 </footer>
             </EnvelopeAnimation>
-        </>
+        </div>
     );
 }
