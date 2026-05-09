@@ -20,6 +20,8 @@ class Event extends Model
         'logo',
         'primary_color',
         'secondary_color',
+        'text_color',
+        'background_color',
         'animation_type',
         'event_date',
         'status',

@@ -91,10 +91,16 @@ class EventController extends Controller
         $validated = $request->validate([
             'primary_color' => 'required|string|max:20',
             'secondary_color' => 'required|string|max:20',
+            'text_color' => 'nullable|string|max:20',
+            'background_color' => 'nullable|string|max:20',
             'animation_type' => 'required|string|in:envelope_3d,fade_in,gate_fold,slipcase,wax_seal',
             'cover_image' => 'nullable|image|max:15360', // 15MB max (will be compressed)
             'logo' => 'nullable|image|max:15360', // 15MB max (will be compressed)
         ]);
+
+        $updateData = $validated;
+        unset($updateData['cover_image']);
+        unset($updateData['logo']);
 
         $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
 
@@ -103,7 +109,7 @@ class EventController extends Controller
             $image->scaleDown(width: 1080); // resize down to max 1080px width
             $filename = 'events/cover_' . uniqid() . '.webp';
             $image->save(storage_path('app/public/' . $filename), 80);
-            $validated['cover_image'] = '/storage/' . $filename;
+            $updateData['cover_image'] = '/storage/' . $filename;
         }
 
         if ($request->hasFile('logo')) {
@@ -111,10 +117,10 @@ class EventController extends Controller
             $image->scaleDown(width: 600); // resize down to max 600px width
             $filename = 'events/logo_' . uniqid() . '.webp';
             $image->save(storage_path('app/public/' . $filename), 80);
-            $validated['logo'] = '/storage/' . $filename;
+            $updateData['logo'] = '/storage/' . $filename;
         }
 
-        $event->update($validated);
+        $event->update($updateData);
 
         return back()->with('success', 'Design atualizado com sucesso!');
     }

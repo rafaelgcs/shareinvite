@@ -17,6 +17,8 @@ export default function Show({ event }) {
         _method: 'put',
         primary_color: event.primary_color || '#1c1917',
         secondary_color: event.secondary_color || '#fafaf9',
+        text_color: event.text_color || '#1c1917',
+        background_color: event.background_color || '#ffffff',
         animation_type: event.animation_type || 'envelope_3d',
         cover_image: null,
         logo: null,
@@ -151,33 +153,163 @@ export default function Show({ event }) {
                                 <form onSubmit={submitDesign} className="space-y-8">
                                     {/* Cores */}
                                     <div>
-                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Paleta de Cores</h3>
-                                        <p className="text-stone-500 mb-6">Defina as cores que irão compor a identidade visual do seu convite.</p>
+                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Paleta de Cores Expandida</h3>
+                                        <p className="text-stone-500 mb-6">Defina as cores que irão compor todos os detalhes da identidade visual do seu convite.</p>
                                         
-                                        <div className="grid md:grid-cols-2 gap-6">
-                                            <div className="border border-stone-200 p-6 rounded-2xl flex items-center justify-between">
-                                                <div>
-                                                    <InputLabel value="Cor Principal" />
-                                                    <p className="text-xs text-stone-400 mt-1">Usada em botões, destaques e ceras.</p>
-                                                </div>
-                                                <input 
-                                                    type="color" 
-                                                    value={designData.primary_color}
-                                                    onChange={e => setDesignData('primary_color', e.target.value)}
-                                                    className="w-14 h-14 rounded-full overflow-hidden cursor-pointer border-0 bg-transparent"
-                                                />
+                                        {/* Combinações Sugeridas */}
+                                        <div className="mb-8">
+                                            <h4 className="text-sm font-medium text-stone-700 mb-3 flex items-center gap-2">
+                                                <Palette className="w-4 h-4" />
+                                                Combinações Elegantes Sugeridas
+                                            </h4>
+                                            <div className="flex flex-wrap gap-3">
+                                                {[
+                                                    { name: 'Ouro Real', p: '#D4AF37', s: '#FCFBF8', t: '#2C2C2C', b: '#F0EEE4' },
+                                                    { name: 'Rose Gold', p: '#B76E79', s: '#FDF5E6', t: '#4A3B3C', b: '#F5EBE1' },
+                                                    { name: 'Azul Serenity', p: '#4A6FA5', s: '#F0F4F8', t: '#1F2E47', b: '#E1E8F0' },
+                                                    { name: 'Verde Sálvia', p: '#7BA05B', s: '#F9FAED', t: '#3A4A28', b: '#ECEEDB' },
+                                                    { name: 'Terracota', p: '#C85A43', s: '#FAF0E6', t: '#5C281D', b: '#F0DFD1' },
+                                                    { name: 'Clássico Black', p: '#1C1917', s: '#FAFAF9', t: '#1C1917', b: '#EAEAEA' },
+                                                ].map(palette => (
+                                                    <button
+                                                        key={palette.name}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setDesignData({
+                                                                ...designData,
+                                                                primary_color: palette.p,
+                                                                secondary_color: palette.s,
+                                                                text_color: palette.t,
+                                                                background_color: palette.b
+                                                            });
+                                                        }}
+                                                        className={`flex items-center gap-2 px-3 py-2 rounded-xl border-2 transition-all shadow-sm hover:shadow-md ${
+                                                            (designData.primary_color || '').toLowerCase() === palette.p.toLowerCase() && (designData.secondary_color || '').toLowerCase() === palette.s.toLowerCase() && (designData.text_color || '').toLowerCase() === palette.t.toLowerCase() && (designData.background_color || '').toLowerCase() === palette.b.toLowerCase()
+                                                            ? 'border-stone-900 bg-stone-50 ring-1 ring-stone-900/10'
+                                                            : 'border-stone-200 bg-white hover:border-stone-300'
+                                                        }`}
+                                                        title={`Aplicar paleta ${palette.name}`}
+                                                    >
+                                                        <div className="flex -space-x-1.5">
+                                                            <div className="w-5 h-5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-30" style={{ backgroundColor: palette.p }} />
+                                                            <div className="w-5 h-5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-20" style={{ backgroundColor: palette.s }} />
+                                                            <div className="w-5 h-5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-10" style={{ backgroundColor: palette.t }} />
+                                                            <div className="w-5 h-5 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.1)] z-0" style={{ backgroundColor: palette.b }} />
+                                                        </div>
+                                                        <span className="text-xs font-medium text-stone-700 whitespace-nowrap">{palette.name}</span>
+                                                    </button>
+                                                ))}
                                             </div>
-                                            <div className="border border-stone-200 p-6 rounded-2xl flex items-center justify-between">
+                                        </div>
+
+                                        <div className="grid md:grid-cols-2 gap-6">
+                                            <div className="border border-stone-200 p-6 rounded-3xl bg-white flex flex-col gap-4 shadow-sm hover:border-stone-300 transition-colors">
                                                 <div>
-                                                    <InputLabel value="Cor Secundária" />
-                                                    <p className="text-xs text-stone-400 mt-1">Fundo do papel, envelope e áreas amplas.</p>
+                                                    <InputLabel value="Cor Principal (Destaques e Cera)" />
+                                                    <p className="text-xs text-stone-400 mt-1">Selo de cera e botões de destaque.</p>
                                                 </div>
-                                                <input 
-                                                    type="color" 
-                                                    value={designData.secondary_color}
-                                                    onChange={e => setDesignData('secondary_color', e.target.value)}
-                                                    className="w-14 h-14 rounded-full overflow-hidden cursor-pointer border-0 bg-transparent"
-                                                />
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-sm border border-stone-200 shrink-0 cursor-pointer" style={{ backgroundColor: designData.primary_color }}>
+                                                        <input 
+                                                            type="color" 
+                                                            value={/^#[0-9A-Fa-f]{6}$/i.test(designData.primary_color) ? designData.primary_color : '#000000'}
+                                                            onChange={e => setDesignData('primary_color', e.target.value)}
+                                                            className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-0 bg-transparent p-0 opacity-0"
+                                                        />
+                                                    </div>
+                                                    <TextInput 
+                                                        className="w-full font-mono text-sm uppercase bg-stone-50"
+                                                        value={designData.primary_color}
+                                                        onChange={e => {
+                                                            let val = e.target.value;
+                                                            if (val.length > 0 && !val.startsWith('#')) val = '#' + val;
+                                                            setDesignData('primary_color', val);
+                                                        }}
+                                                        maxLength={7}
+                                                        placeholder="#000000"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="border border-stone-200 p-6 rounded-3xl bg-white flex flex-col gap-4 shadow-sm hover:border-stone-300 transition-colors">
+                                                <div>
+                                                    <InputLabel value="Cor Secundária (Fundo e Envelope)" />
+                                                    <p className="text-xs text-stone-400 mt-1">Cor do papel interno e do envelope virtual.</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-sm border border-stone-200 shrink-0 cursor-pointer" style={{ backgroundColor: designData.secondary_color }}>
+                                                        <input 
+                                                            type="color" 
+                                                            value={/^#[0-9A-Fa-f]{6}$/i.test(designData.secondary_color) ? designData.secondary_color : '#ffffff'}
+                                                            onChange={e => setDesignData('secondary_color', e.target.value)}
+                                                            className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-0 bg-transparent p-0 opacity-0"
+                                                        />
+                                                    </div>
+                                                    <TextInput 
+                                                        className="w-full font-mono text-sm uppercase bg-stone-50"
+                                                        value={designData.secondary_color}
+                                                        onChange={e => {
+                                                            let val = e.target.value;
+                                                            if (val.length > 0 && !val.startsWith('#')) val = '#' + val;
+                                                            setDesignData('secondary_color', val);
+                                                        }}
+                                                        maxLength={7}
+                                                        placeholder="#FFFFFF"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="border border-stone-200 p-6 rounded-3xl bg-white flex flex-col gap-4 shadow-sm hover:border-stone-300 transition-colors">
+                                                <div>
+                                                    <InputLabel value="Cor do Texto" />
+                                                    <p className="text-xs text-stone-400 mt-1">Textos principais, títulos e informações do evento.</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-sm border border-stone-200 shrink-0 cursor-pointer" style={{ backgroundColor: designData.text_color }}>
+                                                        <input 
+                                                            type="color" 
+                                                            value={/^#[0-9A-Fa-f]{6}$/i.test(designData.text_color) ? designData.text_color : '#000000'}
+                                                            onChange={e => setDesignData('text_color', e.target.value)}
+                                                            className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-0 bg-transparent p-0 opacity-0"
+                                                        />
+                                                    </div>
+                                                    <TextInput 
+                                                        className="w-full font-mono text-sm uppercase bg-stone-50"
+                                                        value={designData.text_color}
+                                                        onChange={e => {
+                                                            let val = e.target.value;
+                                                            if (val.length > 0 && !val.startsWith('#')) val = '#' + val;
+                                                            setDesignData('text_color', val);
+                                                        }}
+                                                        maxLength={7}
+                                                        placeholder="#000000"
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="border border-stone-200 p-6 rounded-3xl bg-white flex flex-col gap-4 shadow-sm hover:border-stone-300 transition-colors">
+                                                <div>
+                                                    <InputLabel value="Cor de Fundo da Página" />
+                                                    <p className="text-xs text-stone-400 mt-1">Fundo visível fora do envelope/papel.</p>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative w-12 h-12 rounded-full overflow-hidden shadow-sm border border-stone-200 shrink-0 cursor-pointer" style={{ backgroundColor: designData.background_color }}>
+                                                        <input 
+                                                            type="color" 
+                                                            value={/^#[0-9A-Fa-f]{6}$/i.test(designData.background_color) ? designData.background_color : '#ffffff'}
+                                                            onChange={e => setDesignData('background_color', e.target.value)}
+                                                            className="absolute -top-2 -left-2 w-16 h-16 cursor-pointer border-0 bg-transparent p-0 opacity-0"
+                                                        />
+                                                    </div>
+                                                    <TextInput 
+                                                        className="w-full font-mono text-sm uppercase bg-stone-50"
+                                                        value={designData.background_color}
+                                                        onChange={e => {
+                                                            let val = e.target.value;
+                                                            if (val.length > 0 && !val.startsWith('#')) val = '#' + val;
+                                                            setDesignData('background_color', val);
+                                                        }}
+                                                        maxLength={7}
+                                                        placeholder="#FFFFFF"
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -234,6 +366,8 @@ export default function Show({ event }) {
                                                     animationType={designData.animation_type}
                                                     primaryColor={designData.primary_color}
                                                     secondaryColor={designData.secondary_color}
+                                                    textColor={designData.text_color}
+                                                    backgroundColor={designData.background_color}
                                                     title={event.title}
                                                     logo={designData.logo ? URL.createObjectURL(designData.logo) : event.logo}
                                                 >
@@ -294,11 +428,13 @@ export default function Show({ event }) {
                                                 />
                                                 {(designData.logo || event.logo) ? (
                                                     <>
-                                                        <img 
-                                                            src={designData.logo ? URL.createObjectURL(designData.logo) : event.logo} 
-                                                            alt="Logo" 
-                                                            className="absolute inset-0 w-full h-full object-contain p-8 opacity-80 group-hover:opacity-50 transition-opacity"
-                                                        />
+                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                            <img 
+                                                                src={designData.logo ? URL.createObjectURL(designData.logo) : event.logo} 
+                                                                alt="Logo" 
+                                                                className="w-32 h-32 object-cover rounded-full shadow-md opacity-80 group-hover:opacity-50 transition-opacity"
+                                                            />
+                                                        </div>
                                                         <div className="relative z-10 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-medium text-sm text-stone-900 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                                                             Trocar Monograma
                                                         </div>

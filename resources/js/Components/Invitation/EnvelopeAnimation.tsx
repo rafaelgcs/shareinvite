@@ -6,6 +6,8 @@ interface EnvelopeProps {
     animationType?: string;
     primaryColor?: string;
     secondaryColor?: string;
+    textColor?: string;
+    backgroundColor?: string;
     logo?: string | null;
     title?: string;
     isPreview?: boolean;
@@ -16,6 +18,8 @@ export default function EnvelopeAnimation({
     animationType = 'envelope_3d',
     primaryColor = '#1c1917',
     secondaryColor = '#fafaf9',
+    textColor = '#1c1917',
+    backgroundColor = '#ffffff',
     logo,
     title,
     isPreview = false
@@ -58,7 +62,7 @@ export default function EnvelopeAnimation({
 
     const renderLogoOrInitial = () => {
         if (logo) {
-            return <img src={logo} alt="Logo" className="w-24 h-24 mx-auto object-contain drop-shadow-md" />;
+            return <img src={logo} alt="Logo" className="w-24 h-24 mx-auto object-cover drop-shadow-md rounded-full overflow-hidden" />;
         }
         return (
             <div 
@@ -105,7 +109,7 @@ export default function EnvelopeAnimation({
                 animate={animateAnim}
                 transition={transitionAnim}
                 className={`${isPreview ? 'h-full w-full' : 'min-h-screen'} origin-bottom`}
-                style={{ backgroundColor: secondaryColor }}
+                style={{ backgroundColor: secondaryColor, color: textColor }}
             >
                 {children}
             </motion.div>
@@ -115,7 +119,7 @@ export default function EnvelopeAnimation({
     return (
         <div 
             className={`${isPreview ? 'absolute inset-0' : 'fixed inset-0'} flex items-center justify-center z-50 overflow-hidden`}
-            style={{ backgroundColor: primaryColor }}
+            style={{ backgroundColor: backgroundColor }}
         >
             <div className="w-full h-full flex items-center justify-center perspective-1000 transform scale-75 md:scale-100">
                 
