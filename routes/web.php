@@ -6,6 +6,7 @@ use App\Http\Controllers\EventLocationController;
 use App\Http\Controllers\EventNoticeController;
 use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\PublicInvitationController;
+use App\Http\Controllers\PostController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -27,6 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Event CRUD
     Route::get('/events/{event}/check-in', [EventController::class, 'checkIn'])->name('events.checkIn');
+    Route::post('/events/{event}/pay', [EventController::class, 'pay'])->name('events.pay');
     Route::resource('events', EventController::class);
     
     // Event Locations CRUD
@@ -54,5 +56,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/auth.php';
 
-// Public Invitation Route
+// Public Invitation & Guest Routes
+Route::get('/g/{uuid}', [PublicInvitationController::class, 'guestLogin'])->name('guest.login');
 Route::get('/{slug}', [PublicInvitationController::class, 'show'])->name('invitation.show');
+Route::get('/{slug}/feed', [PublicInvitationController::class, 'feed'])->name('invitation.feed');
+Route::post('/posts', [PostController::class, 'store'])->name('posts.store');

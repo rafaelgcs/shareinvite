@@ -39,14 +39,14 @@ export default function Create() {
         >
             <Head title="Criar Convite" />
 
-            <div className="py-12 bg-stone-50 min-h-screen">
-                <div className="max-w-3xl mx-auto sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-12 bg-stone-50 min-h-screen">
+                <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
                     <motion.div 
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="bg-white overflow-hidden shadow-xl rounded-3xl border border-stone-100"
                     >
-                        <div className="p-8 md:p-12">
+                        <div className="p-6 sm:p-12">
                             <div className="text-center mb-10">
                                 <div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <span className="font-serif text-2xl text-stone-900">1</span>
@@ -97,7 +97,7 @@ export default function Create() {
                                             Link Personalizado
                                         </InputLabel>
                                         <div className="mt-1 flex rounded-xl shadow-sm">
-                                            <span className="inline-flex items-center px-4 rounded-l-xl border border-r-0 border-stone-200 bg-stone-50 text-stone-500 sm:text-sm">
+                                            <span className="inline-flex items-center px-2 sm:px-4 rounded-l-xl border border-r-0 border-stone-200 bg-stone-50 text-stone-500 text-[10px] sm:text-sm">
                                                 shareinvite.com/
                                             </span>
                                             <TextInput

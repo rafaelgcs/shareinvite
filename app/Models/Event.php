@@ -30,6 +30,7 @@ class Event extends Model
         'allow_extra_guests',
         'max_extra_guests',
         'status',
+        'is_paid',
     ];
 
     protected $casts = [
@@ -38,6 +39,7 @@ class Event extends Model
         'rsvp_enabled' => 'boolean',
         'allow_extra_guests' => 'boolean',
         'max_extra_guests' => 'integer',
+        'is_paid' => 'boolean',
     ];
 
     public function user(): BelongsTo

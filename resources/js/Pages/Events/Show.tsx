@@ -195,9 +195,9 @@ export default function Show({ event }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6">
                     <div>
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-wrap items-center gap-3 mb-2">
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                                 event.status === 'active' 
                                 ? 'bg-green-100 text-green-800' 
@@ -205,7 +205,7 @@ export default function Show({ event }) {
                             }`}>
                                 {event.status === 'active' ? 'Ativo' : 'Rascunho'}
                             </span>
-                            <span className="text-sm text-stone-500 font-mono">
+                            <span className="text-sm text-stone-500 font-mono break-all">
                                 shareinvite.com/{event.slug}
                             </span>
                         </div>
@@ -213,10 +213,10 @@ export default function Show({ event }) {
                             {event.title}
                         </h2>
                     </div>
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
                         <Link 
                             href={route('events.checkIn', event.id)}
-                            className="flex items-center gap-2 bg-stone-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg shadow-stone-200"
+                            className="flex items-center justify-center gap-2 bg-stone-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg shadow-stone-200 w-full sm:w-auto"
                         >
                             <ShieldCheck className="w-4 h-4" />
                             Scanner de Entrada
@@ -224,7 +224,7 @@ export default function Show({ event }) {
                         <Link 
                             href={`/${event.slug}`} 
                             target="_blank"
-                            className="flex items-center gap-2 bg-white border border-stone-200 text-stone-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm"
+                            className="flex items-center justify-center gap-2 bg-white border border-stone-200 text-stone-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm w-full sm:w-auto"
                         >
                             <ExternalLink className="w-4 h-4" />
                             Ver Convite Real
@@ -235,8 +235,8 @@ export default function Show({ event }) {
         >
             <Head title={`Gerenciar: ${event.title}`} />
 
-            <div className="py-12 bg-stone-50 min-h-screen">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div className="py-6 sm:py-12 bg-stone-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     
                     {/* Tabs Navigation */}
                     <div className="flex overflow-x-auto no-scrollbar gap-2 mb-8 bg-white p-2 rounded-2xl shadow-sm border border-stone-100">
@@ -261,7 +261,7 @@ export default function Show({ event }) {
                     </div>
 
                     {/* Tab Content Areas */}
-                    <div className="bg-white shadow-xl rounded-3xl border border-stone-100 min-h-[500px] p-8">
+                    <div className="bg-white shadow-xl rounded-3xl border border-stone-100 min-h-[500px] p-4 sm:p-8">
                         {activeTab === 'settings' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-12">
                                 
@@ -438,7 +438,7 @@ export default function Show({ event }) {
                                             </div>
                                         </div>
                                         
-                                        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                                             {[
                                                 { id: 'classic', label: 'Clássico', desc: 'Tradicional.', icon: '📜' },
                                                 { id: 'modern', label: 'Moderno', desc: 'Clean.', icon: '✨' },
@@ -462,7 +462,7 @@ export default function Show({ event }) {
                                             ))}
                                         </div>
 
-                                        <div className="bg-stone-50 rounded-[40px] p-8 md:p-12 border border-stone-200 mt-12">
+                                        <div className="bg-stone-50 rounded-[40px] p-6 sm:p-8 md:p-12 border border-stone-200 mt-12">
                                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                                                 <div>
                                                     <h3 className="font-serif text-2xl text-stone-900 mb-2">Configurações de RSVP</h3>
@@ -502,7 +502,7 @@ export default function Show({ event }) {
                                                         <p className="mt-2 text-xs text-stone-500 italic">Após esta data, o botão de confirmação ficará desabilitado no convite.</p>
                                                     </div>
 
-                                                    <div className="mt-8 pt-8 border-t border-stone-100 grid md:grid-cols-2 gap-8">
+                                                    <div className="mt-8 pt-8 border-t border-stone-100 grid grid-cols-1 md:grid-cols-2 gap-8">
                                                         <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-stone-200 shadow-sm">
                                                             <div>
                                                                 <InputLabel value="Permitir Acompanhantes" />
@@ -550,9 +550,9 @@ export default function Show({ event }) {
                                             </div>
                                         </div>
                                         
-                                        <div className="grid md:grid-cols-3 gap-8">
+                                        <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8">
                                             {/* Coluna de Seleção */}
-                                            <div className="md:col-span-2 space-y-3">
+                                            <div className="lg:col-span-2 space-y-3">
                                                 {[
                                                     { id: 'envelope_3d', label: 'Envelope Clássico 3D', desc: 'Envelope virtual tradicional com aba superior que se abre.' },
                                                     { id: 'gate_fold', label: 'Convite em Janela (Portão)', desc: 'Duas abas que se abrem horizontalmente revelando o interior.' },
@@ -586,7 +586,7 @@ export default function Show({ event }) {
                                             </div>
 
                                             {/* Preview Simulator */}
-                                            <div className="bg-stone-100 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden h-[400px]">
+                                            <div className="bg-stone-100 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden h-[300px] sm:h-[400px]">
                                                 <EnvelopeAnimation 
                                                     key={previewKey}
                                                     isPreview={true}
@@ -1021,7 +1021,7 @@ export default function Show({ event }) {
 
             <Modal show={isSharingModalOpen} onClose={() => setIsSharingModalOpen(false)} maxWidth="full">
                 <div className="flex flex-col h-screen sm:h-[90vh]">
-                    <div className="p-8 pb-4 flex items-center justify-between border-b border-stone-100 bg-white sticky top-0 z-30">
+                    <div className="p-4 sm:p-8 pb-4 flex items-center justify-between border-b border-stone-100 bg-white sticky top-0 z-30">
                         <div>
                             <h3 className="font-serif text-3xl text-stone-900">Enviar Convite Individual</h3>
                             <p className="text-stone-500 text-base">Compartilhe o convite personalizado com {selectedGuest?.name}</p>
@@ -1031,7 +1031,7 @@ export default function Show({ event }) {
                         </button>
                     </div>
 
-                    <div className="p-8 overflow-y-auto flex-1 bg-stone-50">
+                    <div className="p-4 sm:p-8 overflow-y-auto flex-1 bg-stone-50">
                         <div className="max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
                             {/* Left Side: Ticket Preview */}
                             <div className="flex flex-col items-center">
@@ -1055,7 +1055,7 @@ export default function Show({ event }) {
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <button
                                             onClick={handleDownloadTicket}
-                                            className="flex flex-col items-center justify-center gap-3 bg-white border-2 border-stone-100 text-stone-700 p-8 rounded-3xl font-bold hover:border-stone-200 transition-all shadow-sm group"
+                                            className="flex flex-col items-center justify-center gap-3 bg-white border-2 border-stone-100 text-stone-700 p-6 sm:p-8 rounded-3xl font-bold hover:border-stone-200 transition-all shadow-sm group"
                                         >
                                             <div className="w-12 h-12 bg-stone-100 rounded-2xl flex items-center justify-center group-hover:bg-stone-200 transition-colors">
                                                 <Download className="w-6 h-6" />
@@ -1064,7 +1064,7 @@ export default function Show({ event }) {
                                         </button>
                                         <button
                                             onClick={handleShareTicket}
-                                            className="flex flex-col items-center justify-center gap-3 bg-stone-900 text-white p-8 rounded-3xl font-bold hover:bg-stone-800 transition-all shadow-xl shadow-stone-200 group"
+                                            className="flex flex-col items-center justify-center gap-3 bg-stone-900 text-white p-6 sm:p-8 rounded-3xl font-bold hover:bg-stone-800 transition-all shadow-xl shadow-stone-200 group"
                                         >
                                             <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-white/20 transition-colors">
                                                 <Share2 className="w-6 h-6" />

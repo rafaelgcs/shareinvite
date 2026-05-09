@@ -10,13 +10,13 @@ export default function Dashboard({ events }) {
     return (
         <AuthenticatedLayout
             header={
-                <div className="flex justify-between items-center">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="font-serif text-3xl text-stone-900 leading-tight">
                         Meus Eventos
                     </h2>
                     <Link 
                         href={route('events.create')}
-                        className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg"
+                        className="flex items-center gap-2 bg-stone-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg w-full sm:w-auto justify-center"
                     >
                         <Plus className="w-4 h-4" />
                         Criar Convite
@@ -26,8 +26,8 @@ export default function Dashboard({ events }) {
         >
             <Head title="Painel do Anfitrião" />
 
-            <div className="py-12 bg-stone-50 min-h-screen">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="py-6 sm:py-12 bg-stone-50 min-h-screen">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
                     
                     {/* Stats Overview */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -52,7 +52,7 @@ export default function Dashboard({ events }) {
                     </div>
 
                     {/* Events List */}
-                    <div className="bg-white overflow-hidden shadow-sm rounded-3xl border border-stone-100 p-8">
+                    <div className="bg-white overflow-hidden shadow-sm rounded-3xl border border-stone-100 p-6 sm:p-8">
                         <h3 className="font-serif text-xl text-stone-900 mb-6">Convites Recentes</h3>
                         
                         {events.length === 0 ? (
@@ -85,11 +85,11 @@ export default function Dashboard({ events }) {
                                             <div className="absolute inset-0 bg-gradient-to-br from-stone-700 to-stone-900 opacity-90" />
                                             <div className="absolute top-4 right-4">
                                                 <span className={`px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md ${
-                                                    evt.status === 'active' 
+                                                    evt.is_paid 
                                                     ? 'bg-green-500/20 text-green-100 border border-green-500/30' 
-                                                    : 'bg-white/20 text-white border border-white/30'
+                                                    : 'bg-amber-500/20 text-amber-100 border border-amber-500/30'
                                                 }`}>
-                                                    {evt.status === 'active' ? 'Ativo' : 'Rascunho'}
+                                                    {evt.is_paid ? 'Ativo' : 'Pendente'}
                                                 </span>
                                             </div>
                                         </div>
@@ -110,6 +110,17 @@ export default function Dashboard({ events }) {
                                             <p className="text-xs text-stone-500 text-right mb-4">
                                                 {evt.guests} de {evt.limit} convidados
                                             </p>
+
+                                            {!evt.is_paid && (
+                                                <Link 
+                                                    href={route('events.pay', evt.id)} 
+                                                    method="post"
+                                                    as="button"
+                                                    className="w-full mb-4 py-3 bg-amber-500 text-amber-950 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-amber-400 transition-colors shadow-sm"
+                                                >
+                                                    Liberar Convite (Pagar)
+                                                </Link>
+                                            )}
 
                                             <div className="mt-auto pt-4 border-t border-stone-200 flex justify-between items-center">
                                                 <Link href={route('events.show', evt.id)} className="text-sm font-medium text-stone-900 hover:underline">

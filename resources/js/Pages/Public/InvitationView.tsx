@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 import NoticeModal from '@/Components/Invitation/NoticeModal';
-import { Head } from '@inertiajs/react';
+import { Head, Link } from '@inertiajs/react';
+import { Camera } from 'lucide-react';
 import ClassicTheme from '@/Components/Themes/ClassicTheme';
 import ModernTheme from '@/Components/Themes/ModernTheme';
 import FloralTheme from '@/Components/Themes/FloralTheme';
@@ -24,6 +25,7 @@ interface InvitationViewProps {
         theme?: string;
         rsvp_enabled?: boolean;
         rsvp_deadline?: string | null;
+        slug: string;
     };
     locations: Array<{
         id: number;
@@ -159,6 +161,21 @@ export default function InvitationView({ event, locations, notices, guides }: In
                     )}
                 </motion.div>
             )}
+
+            {/* Floating Feed Button */}
+            <motion.div 
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3"
+            >
+                <Link 
+                    href={route('invitation.feed', event.slug)}
+                    className="w-14 h-14 bg-white/80 backdrop-blur-md text-stone-900 rounded-full shadow-2xl flex items-center justify-center border border-stone-200 hover:scale-110 active:scale-95 transition-all group pointer-events-auto"
+                >
+                    <Camera className="w-6 h-6" />
+                    <span className="absolute right-16 bg-stone-900 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Mural de Fotos</span>
+                </Link>
+            </motion.div>
         </div>
     );
 }

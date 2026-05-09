@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Guest;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 class PublicInvitationController extends Controller
@@ -12,6 +14,14 @@ class PublicInvitationController extends Controller
         $event = Event::where('slug', $slug)
             ->with(['locations', 'notices'])
             ->firstOrFail();
+
+        if (!$event->is_paid) {
+            return Inertia::render('Public/UnpaidEvent', [
+                'event' => [
+                    'title' => $event->title,
+                ]
+            ]);
+        }
 
         return Inertia::render('Public/InvitationView', [
             'event' => [
@@ -30,10 +40,36 @@ class PublicInvitationController extends Controller
                 'rsvp_deadline' => $event->rsvp_deadline ? $event->rsvp_deadline->format('Y-m-d') : null,
                 'allow_extra_guests' => $event->allow_extra_guests,
                 'max_extra_guests' => $event->max_extra_guests,
+                'slug' => $event->slug,
             ],
             'locations' => $event->locations,
             'notices' => $event->notices,
             'guides' => $event->guides,
+        ]);
+    }
+
+    public function guestLogin($uuid)
+    {
+        $guest = Guest::where('uuid', $uuid)->with('event')->firstOrFail();
+        
+        // Store guest info in session
+        session(['guest_id' => $guest->id, 'guest_name' => $guest->name]);
+
+        return redirect()->route('invitation.show', $guest->event->slug);
+    }
+
+    public function feed($slug)
+    {
+        $event = Event::where('slug', $slug)->firstOrFail();
+        $posts = $event->posts()->latest()->get();
+
+        return Inertia::render('Public/Feed', [
+            'event' => $event,
+            'posts' => $posts,
+            'guest' => session('guest_id') ? [
+                'id' => session('guest_id'),
+                'name' => session('guest_name'),
+            ] : null,
         ]);
     }
 }

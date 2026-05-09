@@ -43,7 +43,7 @@ const DigitalTicket = forwardRef<HTMLDivElement, DigitalTicketProps>(({ guest, e
             <div className="px-8 -mt-6 relative z-10">
                 <div className="bg-white p-4 rounded-2xl shadow-xl border border-stone-100 flex justify-center">
                     <QRCodeSVG 
-                        value={guest?.uuid || ''} 
+                        value={`${window.location.origin}/g/${guest?.uuid}`} 
                         size={180}
                         level="H"
                         includeMargin={true}

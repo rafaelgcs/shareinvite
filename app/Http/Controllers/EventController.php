@@ -25,6 +25,7 @@ class EventController extends Controller
                 'status' => $event->status,
                 'guests' => $event->guests_count,
                 'limit' => $limit,
+                'is_paid' => $event->is_paid,
             ];
         });
 
@@ -182,5 +183,19 @@ class EventController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function pay(Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $event->update([
+            'is_paid' => true,
+            'status' => 'active'
+        ]);
+
+        return back()->with('success', 'Evento liberado com sucesso!');
     }
 }
