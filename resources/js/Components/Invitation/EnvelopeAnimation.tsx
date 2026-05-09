@@ -207,13 +207,14 @@ export default function EnvelopeAnimation({
                         </motion.div>
 
                         {/* Center Seal */}
-                        <motion.div 
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none"
-                            animate={isOpened ? { scale: 1.5, opacity: 0 } : { scale: 1, opacity: 1 }}
-                            transition={{ duration: 0.5 }}
-                        >
-                            {renderLogoOrInitial()}
-                        </motion.div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 pointer-events-none flex items-center justify-center">
+                            <motion.div 
+                                animate={isOpened ? { scale: 1.5, opacity: 0 } : { scale: 1, opacity: 1 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                {renderLogoOrInitial()}
+                            </motion.div>
+                        </div>
                         
                         <motion.div 
                             className="absolute -bottom-10 left-0 right-0 text-center font-serif tracking-widest text-sm uppercase opacity-70 text-white"
