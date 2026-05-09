@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MapPin } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface Location {
     id: number;
@@ -22,36 +23,53 @@ export default function GoogleMapWidget({ locations, layout = 'tabs' }: GoogleMa
 
     if (layout === 'list') {
         return (
-            <div className="space-y-8">
-                {locations.map((loc) => (
-                    <div key={loc.id} className="w-full rounded-3xl overflow-hidden bg-white shadow-lg border border-stone-100 flex flex-col md:flex-row">
-                        {/* Map Mini Placeholder */}
-                        <div className="w-full md:w-48 h-48 bg-stone-100 relative shrink-0">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <MapPin className="w-8 h-8 text-stone-300" />
-                            </div>
-                        </div>
+            <div className="flex flex-col gap-12 max-w-3xl mx-auto">
+                {locations.map((loc, index) => (
+                    <motion.div 
+                        key={loc.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: index * 0.1 }}
+                        className="relative pl-12 md:pl-16 group"
+                    >
+                        {/* Vertical line indicator */}
+                        <div className="absolute left-4 top-0 bottom-0 w-px bg-stone-200 group-last:bottom-auto group-last:h-12" />
                         
-                        <div className="p-6 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h4 className="font-serif text-2xl text-stone-900 mb-2">{loc.name}</h4>
-                                <p className="text-stone-500 mb-4">{loc.address}</p>
+                        {/* Dot indicator */}
+                        <div className="absolute left-[13px] top-2 w-2 h-2 rounded-full bg-stone-900 border-4 border-white ring-1 ring-stone-200 z-10" />
+
+                        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+                            <div className="flex-1">
+                                <h4 className="font-serif text-3xl text-stone-900 mb-3 group-hover:text-stone-600 transition-colors">
+                                    {loc.name}
+                                </h4>
+                                <p className="text-stone-500 font-light leading-relaxed mb-4 max-w-lg">
+                                    {loc.address}
+                                </p>
+                                
                                 {loc.notes && (
-                                    <p className="text-sm text-stone-400 italic mb-4">"{loc.notes}"</p>
+                                    <p className="text-sm text-stone-400 italic font-light mb-4 flex items-start gap-2">
+                                        <span className="text-stone-300">"</span>
+                                        {loc.notes}
+                                        <span className="text-stone-300">"</span>
+                                    </p>
                                 )}
                             </div>
-                            
-                            <a
-                                href={`https://maps.google.com/?q=${encodeURIComponent(loc.address)}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-2 text-stone-900 font-medium hover:underline"
-                            >
-                                <MapPin className="w-4 h-4" />
-                                Abrir no Google Maps
-                            </a>
+
+                            <div className="shrink-0">
+                                <a
+                                    href={`https://maps.google.com/?q=${encodeURIComponent(loc.address)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-stone-200 text-stone-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-stone-50 hover:border-stone-400 transition-all shadow-sm active:scale-95"
+                                >
+                                    <MapPin className="w-3.5 h-3.5" />
+                                    Ver no Mapa
+                                </a>
+                            </div>
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
             </div>
         );

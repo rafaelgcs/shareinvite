@@ -5,9 +5,11 @@ import RsvpForm from '@/Components/Invitation/RsvpForm';
 interface ThemeProps {
     event: any;
     locations: any[];
+    guides?: any[];
 }
 
-export default function DarkTheme({ event, locations }: ThemeProps) {
+export default function DarkTheme({ event, locations, guides = [] }: ThemeProps) {
+
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
 
     return (
@@ -65,8 +67,40 @@ export default function DarkTheme({ event, locations }: ThemeProps) {
                 </div>
             </section>
 
+            {/* Guides Section - Dark Sleek */}
+            {guides.length > 0 && (
+                <section className="py-32 px-4 bg-[#0a0a0a] border-t border-white/5">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="mb-20 grid md:grid-cols-2 items-end gap-8">
+                            <div>
+                                <h2 className="text-5xl font-serif uppercase tracking-tighter">The Essentials</h2>
+                                <p className="text-white/40 mt-4 font-light">Important information for all distinguished guests.</p>
+                            </div>
+                            <div className="h-px bg-white/20 w-full mb-4" />
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-1px bg-white/10 border border-white/10 rounded-3xl overflow-hidden">
+                            {guides.map((guide) => (
+                                <motion.div 
+                                    key={guide.id}
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
+                                    viewport={{ once: true }}
+                                    className="p-12 bg-[#0a0a0a]"
+                                >
+                                    <h3 className="text-xs font-bold uppercase tracking-[0.3em] text-white/30 mb-6">{guide.title}</h3>
+                                    <div className="text-white/70 font-light leading-relaxed whitespace-pre-wrap">
+                                        {guide.content}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* RSVP Section - Dark Card */}
-            <section className="py-32 px-4 bg-[#111] border-t border-white/5">
+            <section id="rsvp-section" className="py-32 px-4 bg-[#111] border-t border-white/5">
                 <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}

@@ -25,11 +25,15 @@ class Event extends Model
         'animation_type',
         'theme',
         'event_date',
+        'rsvp_enabled',
+        'rsvp_deadline',
         'status',
     ];
 
     protected $casts = [
         'event_date' => 'datetime',
+        'rsvp_deadline' => 'date',
+        'rsvp_enabled' => 'boolean',
     ];
 
     public function user(): BelongsTo
@@ -60,5 +64,10 @@ class Event extends Model
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class);
+    }
+
+    public function guides(): HasMany
+    {
+        return $this->hasMany(EventGuide::class);
     }
 }

@@ -5,9 +5,11 @@ import RsvpForm from '@/Components/Invitation/RsvpForm';
 interface ThemeProps {
     event: any;
     locations: any[];
+    guides?: any[];
 }
 
-export default function VintageTheme({ event, locations }: ThemeProps) {
+export default function VintageTheme({ event, locations, guides = [] }: ThemeProps) {
+
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
 
     return (
@@ -63,8 +65,37 @@ export default function VintageTheme({ event, locations }: ThemeProps) {
                 </div>
             </section>
 
+            {/* Guides Section - Antique style */}
+            {guides.length > 0 && (
+                <section className="py-32 px-4 relative overflow-hidden">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="mb-20 text-center">
+                            <h2 className="text-4xl italic text-[#bc6c25] mb-4">Avisos aos Convidados</h2>
+                            <div className="w-48 h-px bg-[#bc6c25]/20 mx-auto" />
+                        </div>
+                        
+                        <div className="space-y-16">
+                            {guides.map((guide) => (
+                                <motion.div 
+                                    key={guide.id}
+                                    initial={{ opacity: 0 }}
+                                    whileInView={{ opacity: 1 }}
+                                    viewport={{ once: true }}
+                                    className="border-l-4 border-[#bc6c25]/20 pl-8 py-2"
+                                >
+                                    <h3 className="text-xl uppercase tracking-widest text-[#3d405b] mb-4 font-bold">{guide.title}</h3>
+                                    <div className="text-lg text-[#6a6c7c] italic leading-relaxed whitespace-pre-wrap">
+                                        {guide.content}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* RSVP Section */}
-            <section className="py-32 px-4">
+            <section id="rsvp-section" className="py-32 px-4">
                 <motion.div 
                     initial={{ opacity: 0, scale: 0.98 }}
                     whileInView={{ opacity: 1, scale: 1 }}

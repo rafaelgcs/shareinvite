@@ -72,7 +72,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        $event->load(['locations', 'notices', 'guests']);
+        $event->load(['locations', 'notices', 'guests', 'guides']);
 
         return Inertia::render('Events/Show', [
             'event' => $event,
@@ -95,6 +95,8 @@ class EventController extends Controller
             'background_color' => 'nullable|string|max:20',
             'animation_type' => 'required|string|in:envelope_3d,fade_in,gate_fold,slipcase,wax_seal',
             'theme' => 'required|string|in:classic,modern,floral,dark,vintage',
+            'rsvp_enabled' => 'required|boolean',
+            'rsvp_deadline' => 'nullable|date',
             'cover_image' => 'nullable|image|max:15360', // 15MB max (will be compressed)
             'logo' => 'nullable|image|max:15360', // 15MB max (will be compressed)
         ]);

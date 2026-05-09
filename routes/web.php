@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventLocationController;
 use App\Http\Controllers\EventNoticeController;
+use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\PublicInvitationController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Event Notices CRUD
     Route::post('/events/{event}/notices', [EventNoticeController::class, 'store'])->name('events.notices.store');
     Route::delete('/events/{event}/notices/{notice}', [EventNoticeController::class, 'destroy'])->name('events.notices.destroy');
+
+    // Event Guides CRUD
+    Route::post('/events/{event}/guides', [EventGuideController::class, 'store'])->name('events.guides.store');
+    Route::delete('/events/{event}/guides/{guide}', [EventGuideController::class, 'destroy'])->name('events.guides.destroy');
     
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -26,9 +26,12 @@ class PublicInvitationController extends Controller
                 'background_color' => $event->background_color,
                 'animation_type' => $event->animation_type,
                 'theme' => $event->theme,
+                'rsvp_enabled' => $event->rsvp_enabled,
+                'rsvp_deadline' => $event->rsvp_deadline ? $event->rsvp_deadline->format('Y-m-d') : null,
             ],
             'locations' => $event->locations,
             'notices' => $event->notices,
+            'guides' => $event->guides,
         ]);
     }
 }

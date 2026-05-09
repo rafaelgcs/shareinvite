@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2 } from 'lucide-react';
+import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen } from 'lucide-react';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -21,6 +21,8 @@ export default function Show({ event }) {
         background_color: event.background_color || '#ffffff',
         animation_type: event.animation_type || 'envelope_3d',
         theme: event.theme || 'classic',
+        rsvp_enabled: event.rsvp_enabled ?? true,
+        rsvp_deadline: event.rsvp_deadline || '',
         cover_image: null,
         logo: null,
     });
@@ -58,6 +60,25 @@ export default function Show({ event }) {
         });
     };
 
+    const { data: guideData, setData: setGuideData, post: postGuide, processing: guideProcessing, reset: resetGuide } = useForm({
+        title: '',
+        content: '',
+        type: 'other',
+    });
+
+    const submitGuide = (e) => {
+        e.preventDefault();
+        postGuide(route('events.guides.store', event.id), {
+            onSuccess: () => resetGuide()
+        });
+    };
+
+    const deleteGuide = (id) => {
+        if (confirm('Remover guia?')) {
+            router.delete(route('events.guides.destroy', [event.id, id]));
+        }
+    };
+
     const deleteLocation = (id) => {
         if (confirm('Remover local?')) {
             router.delete(route('events.locations.destroy', [event.id, id]));
@@ -74,6 +95,7 @@ export default function Show({ event }) {
         { id: 'settings', label: 'Design e Capa', icon: Palette },
         { id: 'locations', label: 'Locais', icon: MapPin },
         { id: 'notices', label: 'Avisos', icon: Bell },
+        { id: 'guides', label: 'Guias e Dress Code', icon: BookOpen },
         { id: 'guests', label: 'Lista de Presença', icon: Users },
     ];
 
@@ -348,6 +370,49 @@ export default function Show({ event }) {
                                             ))}
                                         </div>
 
+                                        <div className="bg-stone-50 rounded-[40px] p-8 md:p-12 border border-stone-200 mt-12">
+                                            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                                                <div>
+                                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Configurações de RSVP</h3>
+                                                    <p className="text-stone-500">Controle como e até quando seus convidados podem confirmar presença.</p>
+                                                </div>
+                                                
+                                                <div className="flex items-center gap-4">
+                                                     <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input 
+                                                            type="checkbox" 
+                                                            className="sr-only peer" 
+                                                            checked={designData.rsvp_enabled}
+                                                            onChange={e => setDesignData('rsvp_enabled', e.target.checked)}
+                                                        />
+                                                        <div className="w-14 h-7 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-stone-900"></div>
+                                                        <span className="ms-3 text-sm font-medium text-stone-900">
+                                                            {designData.rsvp_enabled ? 'RSVP Habilitado' : 'RSVP Desabilitado'}
+                                                        </span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            {designData.rsvp_enabled && (
+                                                <motion.div 
+                                                    initial={{ opacity: 0, height: 0 }}
+                                                    animate={{ opacity: 1, height: 'auto' }}
+                                                    className="mt-8 pt-8 border-t border-stone-200"
+                                                >
+                                                    <div className="max-w-xs">
+                                                        <InputLabel value="Data Limite para Confirmação" />
+                                                        <input 
+                                                            type="date"
+                                                            className="mt-1 block w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none"
+                                                            value={designData.rsvp_deadline}
+                                                            onChange={e => setDesignData('rsvp_deadline', e.target.value)}
+                                                        />
+                                                        <p className="mt-2 text-xs text-stone-500 italic">Após esta data, o botão de confirmação ficará desabilitado no convite.</p>
+                                                    </div>
+                                                </motion.div>
+                                            )}
+                                        </div>
+
                                     </div>
 
 
@@ -603,6 +668,75 @@ export default function Show({ event }) {
                                                 <button onClick={() => deleteNotice(notice.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors">
                                                     <Trash2 className="w-5 h-5" />
                                                 </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
+                        {activeTab === 'guides' && (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                <div className="mb-8">
+                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Guias e Dress Code</h3>
+                                    <p className="text-stone-500">Crie guias informativos para seus convidados, padrinhos e madrinhas.</p>
+                                </div>
+
+                                <div className="bg-stone-50 p-6 rounded-3xl border border-stone-200 mb-8">
+                                    <form onSubmit={submitGuide} className="space-y-4">
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div className="w-full">
+                                                <InputLabel value="Título do Guia" />
+                                                <TextInput className="mt-1 w-full" value={guideData.title} onChange={e => setGuideData('title', e.target.value)} required placeholder="Ex: Dress Code / Traje" />
+                                            </div>
+                                            <div className="w-full">
+                                                <InputLabel value="Tipo de Guia" />
+                                                <select 
+                                                    className="mt-1 block w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none"
+                                                    value={guideData.type} 
+                                                    onChange={e => setGuideData('type', e.target.value)}
+                                                >
+                                                    <option value="dress_code">Dress Code</option>
+                                                    <option value="best_man">Padrinhos</option>
+                                                    <option value="bridesmaid">Madrinhas</option>
+                                                    <option value="other">Outro Guia</option>
+                                                </select>
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <InputLabel value="Conteúdo do Guia" />
+                                                <textarea 
+                                                    className="mt-1 block w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none min-h-[120px]"
+                                                    value={guideData.content}
+                                                    onChange={e => setGuideData('content', e.target.value)}
+                                                    required
+                                                    placeholder="Descreva as orientações aqui..."
+                                                ></textarea>
+                                            </div>
+                                        </div>
+                                        <PrimaryButton disabled={guideProcessing}>Adicionar Guia</PrimaryButton>
+                                    </form>
+                                </div>
+
+                                {event.guides?.length === 0 ? (
+                                    <div className="text-center py-12 border border-stone-200 rounded-3xl bg-stone-50">
+                                        <BookOpen className="w-12 h-12 text-stone-300 mx-auto mb-3" />
+                                        <p className="text-stone-500">Nenhum guia criado ainda.</p>
+                                    </div>
+                                ) : (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {event.guides?.map((guide) => (
+                                            <div key={guide.id} className="p-6 border border-stone-200 rounded-3xl bg-white flex flex-col justify-between shadow-sm hover:shadow-md transition-all">
+                                                <div>
+                                                    <div className="flex justify-between items-start mb-4">
+                                                        <span className="px-3 py-1 bg-stone-100 text-stone-600 rounded-full text-xs font-semibold uppercase tracking-wider">
+                                                            {guide.type.replace('_', ' ')}
+                                                        </span>
+                                                        <button onClick={() => deleteGuide(guide.id)} className="text-red-500 hover:bg-red-50 p-2 rounded-full transition-colors">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                    <h4 className="font-serif text-xl text-stone-900 mb-3">{guide.title}</h4>
+                                                    <p className="text-stone-600 text-sm whitespace-pre-wrap">{guide.content}</p>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>

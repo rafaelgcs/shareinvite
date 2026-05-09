@@ -5,9 +5,11 @@ import RsvpForm from '@/Components/Invitation/RsvpForm';
 interface ThemeProps {
     event: any;
     locations: any[];
+    guides?: any[];
 }
 
-export default function FloralTheme({ event, locations }: ThemeProps) {
+export default function FloralTheme({ event, locations, guides = [] }: ThemeProps) {
+
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
 
     return (
@@ -82,8 +84,42 @@ export default function FloralTheme({ event, locations }: ThemeProps) {
                 </div>
             </section>
 
+            {/* Guides Section - Floral */}
+            {guides.length > 0 && (
+                <section className="py-24 px-4 bg-white relative">
+                    <div className="absolute top-0 right-0 w-64 h-64 opacity-5 rotate-180 pointer-events-none">
+                         <div className="w-full h-full rounded-full border-[20px] border-stone-900" />
+                    </div>
+                    
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="font-serif text-4xl text-stone-900 mb-2 italic">Dicas e Orientações</h2>
+                            <p className="font-serif text-stone-400">Preparamos alguns guias para que tudo seja perfeito.</p>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-12">
+                            {guides.map((guide) => (
+                                <motion.div 
+                                    key={guide.id}
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    whileInView={{ opacity: 1, scale: 1 }}
+                                    viewport={{ once: true }}
+                                    className="p-10 border border-stone-100 rounded-[50px] bg-[#fffcf9] text-center shadow-sm"
+                                >
+                                    <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-stone-50">
+                                        <span className="text-xs">✨</span>
+                                    </div>
+                                    <h3 className="font-serif text-2xl text-stone-800 mb-4">{guide.title}</h3>
+                                    <p className="font-serif italic text-stone-600 leading-relaxed whitespace-pre-wrap">{guide.content}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* RSVP Section - Elegant */}
-            <section className="py-32 px-4 bg-stone-900 text-white relative">
+            <section id="rsvp-section" className="py-32 px-4 bg-stone-900 text-white relative">
                  <div className="max-w-3xl mx-auto relative z-10">
                     <div className="text-center mb-16">
                         <h2 className="font-serif text-5xl mb-6 italic">Sua presença é essencial</h2>

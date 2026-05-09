@@ -5,9 +5,11 @@ import RsvpForm from '@/Components/Invitation/RsvpForm';
 interface ThemeProps {
     event: any;
     locations: any[];
+    guides?: any[];
 }
 
-export default function ClassicTheme({ event, locations }: ThemeProps) {
+export default function ClassicTheme({ event, locations, guides = [] }: ThemeProps) {
+
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
 
     return (
@@ -65,8 +67,39 @@ export default function ClassicTheme({ event, locations }: ThemeProps) {
                 </motion.div>
             </section>
 
+            {/* Guides Section */}
+            {guides.length > 0 && (
+                <section className="py-24 px-4 bg-stone-50 border-y border-stone-200">
+                    <div className="max-w-4xl mx-auto">
+                        <div className="text-center mb-16">
+                            <h2 className="font-serif text-4xl mb-4" style={{ color: 'var(--color-primary)' }}>Guia do Evento</h2>
+                            <div className="w-12 h-0.5 mx-auto mb-4" style={{ backgroundColor: 'var(--color-primary)' }} />
+                            <p className="text-stone-500 italic">Informações importantes para que você aproveite cada momento.</p>
+                        </div>
+                        
+                        <div className="grid md:grid-cols-2 gap-8">
+                            {guides.map((guide) => (
+                                <motion.div 
+                                    key={guide.id}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    className="p-8 bg-white rounded-3xl border border-stone-100 shadow-sm"
+                                >
+                                    <span className="text-xs font-bold uppercase tracking-widest text-stone-400 mb-2 block">
+                                        {guide.type.replace('_', ' ')}
+                                    </span>
+                                    <h3 className="font-serif text-2xl text-stone-900 mb-4">{guide.title}</h3>
+                                    <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">{guide.content}</p>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             {/* RSVP Section */}
-            <section className="py-24 px-4 bg-white relative overflow-hidden">
+            <section id="rsvp-section" className="py-24 px-4 bg-white relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
                 <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 translate-x-1/2 translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
                 
