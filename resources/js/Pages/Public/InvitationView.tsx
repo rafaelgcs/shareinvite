@@ -1,9 +1,12 @@
 import { motion } from 'framer-motion';
 import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 import NoticeModal from '@/Components/Invitation/NoticeModal';
-import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
-import RsvpForm from '@/Components/Invitation/RsvpForm';
 import { Head } from '@inertiajs/react';
+import ClassicTheme from '@/Components/Themes/ClassicTheme';
+import ModernTheme from '@/Components/Themes/ModernTheme';
+import FloralTheme from '@/Components/Themes/FloralTheme';
+import DarkTheme from '@/Components/Themes/DarkTheme';
+import VintageTheme from '@/Components/Themes/VintageTheme';
 
 // Example props interface coming from Laravel/Inertia
 interface InvitationViewProps {
@@ -15,7 +18,10 @@ interface InvitationViewProps {
         event_date: string;
         primary_color?: string;
         secondary_color?: string;
+        text_color?: string;
+        background_color?: string;
         animation_type?: string;
+        theme?: string;
     };
     locations: Array<{
         id: number;
@@ -33,94 +39,52 @@ interface InvitationViewProps {
 }
 
 export default function InvitationView({ event, locations, notices }: InvitationViewProps) {
-    const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
     const primaryColor = event.primary_color || '#1c1917';
     const secondaryColor = event.secondary_color || '#fafaf9';
+    const textColor = event.text_color || '#1c1917';
+    const backgroundColor = event.background_color || '#ffffff';
     const animationType = event.animation_type || 'envelope_3d';
+    const theme = event.theme || 'classic';
+
+    const renderTheme = () => {
+        switch (theme) {
+            case 'modern':
+                return <ModernTheme event={event} locations={locations} />;
+            case 'floral':
+                return <FloralTheme event={event} locations={locations} />;
+            case 'dark':
+                return <DarkTheme event={event} locations={locations} />;
+            case 'vintage':
+                return <VintageTheme event={event} locations={locations} />;
+            case 'classic':
+            default:
+                return <ClassicTheme event={event} locations={locations} />;
+        }
+    };
 
     return (
-        <div style={{ '--color-primary': primaryColor, '--color-secondary': secondaryColor } as React.CSSProperties}>
+        <div style={{ 
+            '--color-primary': primaryColor, 
+            '--color-secondary': secondaryColor,
+            '--color-text': textColor,
+            '--color-bg': backgroundColor
+        } as React.CSSProperties}>
             <Head title={`Convite: ${event.title}`} />
             
             <EnvelopeAnimation 
                 animationType={animationType}
                 primaryColor={primaryColor}
                 secondaryColor={secondaryColor}
+                textColor={textColor}
+                backgroundColor={backgroundColor}
                 logo={event.logo}
                 title={event.title}
             >
                 <NoticeModal notices={notices} />
 
-                {/* Cover Section */}
-                <section className="relative w-full h-[80vh] flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0 z-0">
-                        <img 
-                            src={event.cover_image || defaultCover} 
-                            alt="Capa do Evento"
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-black/40" />
-                    </div>
+                {renderTheme()}
 
-                    <motion.div 
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: 0.5 }}
-                        className="relative z-10 text-center px-4"
-                    >
-                        {event.logo ? (
-                            <img src={event.logo} alt="Logo" className="w-32 h-32 mx-auto mb-6 object-contain drop-shadow-xl" />
-                        ) : (
-                            <div className="w-24 h-24 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mx-auto flex items-center justify-center mb-6 shadow-xl">
-                                <span className="font-serif text-3xl text-white">M&A</span>
-                            </div>
-                        )}
-                        <h1 className="font-serif text-5xl md:text-7xl text-white tracking-wide drop-shadow-lg mb-4">
-                            {event.title}
-                        </h1>
-                        <p className="text-white/90 font-light tracking-widest uppercase text-sm md:text-base">
-                            {new Date(event.event_date).toLocaleDateString('pt-BR', {
-                                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                            })}
-                        </p>
-                    </motion.div>
-                </section>
-
-                {/* Locations Section */}
-                <section className="py-24 px-4" style={{ backgroundColor: 'var(--color-secondary)' }}>
-                    <motion.div 
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="max-w-4xl mx-auto"
-                    >
-                        <div className="text-center mb-12">
-                            <h2 className="font-serif text-4xl mb-4" style={{ color: 'var(--color-primary)' }}>Localização</h2>
-                            <div className="w-12 h-0.5 mx-auto" style={{ backgroundColor: 'var(--color-primary)' }} />
-                        </div>
-                        
-                        <GoogleMapWidget locations={locations} />
-                    </motion.div>
-                </section>
-
-                {/* RSVP Section */}
-                <section className="py-24 px-4 bg-white relative overflow-hidden">
-                    {/* Decorative elements */}
-                    <div className="absolute top-0 left-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-x-1/2 -translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
-                    <div className="absolute bottom-0 right-0 w-64 h-64 rounded-full mix-blend-multiply filter blur-3xl opacity-20 translate-x-1/2 translate-y-1/2" style={{ backgroundColor: 'var(--color-primary)' }} />
-                    
-                    <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="relative z-10"
-                    >
-                        <RsvpForm eventId={event.id} />
-                    </motion.div>
-                </section>
-
-                {/* Footer */}
+                {/* Footer - Shared across themes for branding */}
                 <footer className="py-12 text-center text-white/50 text-sm" style={{ backgroundColor: 'var(--color-primary)' }}>
                     <p>Feito com ❤️ pela plataforma ShareInvite.</p>
                 </footer>
@@ -128,3 +92,4 @@ export default function InvitationView({ event, locations, notices }: Invitation
         </div>
     );
 }
+

@@ -94,6 +94,7 @@ class EventController extends Controller
             'text_color' => 'nullable|string|max:20',
             'background_color' => 'nullable|string|max:20',
             'animation_type' => 'required|string|in:envelope_3d,fade_in,gate_fold,slipcase,wax_seal',
+            'theme' => 'required|string|in:classic,modern,floral,dark,vintage',
             'cover_image' => 'nullable|image|max:15360', // 15MB max (will be compressed)
             'logo' => 'nullable|image|max:15360', // 15MB max (will be compressed)
         ]);

@@ -20,6 +20,7 @@ export default function Show({ event }) {
         text_color: event.text_color || '#1c1917',
         background_color: event.background_color || '#ffffff',
         animation_type: event.animation_type || 'envelope_3d',
+        theme: event.theme || 'classic',
         cover_image: null,
         logo: null,
     });
@@ -313,6 +314,42 @@ export default function Show({ event }) {
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Tema Visual (Pós-Envelope) */}
+                                    <div className="pt-8 border-t border-stone-100">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div>
+                                                <h3 className="font-serif text-2xl text-stone-900 mb-2">Tema do Convite</h3>
+                                                <p className="text-stone-500">Escolha o layout e a identidade visual da página interna do convite.</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+                                            {[
+                                                { id: 'classic', label: 'Clássico', desc: 'Tradicional.', icon: '📜' },
+                                                { id: 'modern', label: 'Moderno', desc: 'Clean.', icon: '✨' },
+                                                { id: 'floral', label: 'Floral', desc: 'Romântico.', icon: '🌸' },
+                                                { id: 'dark', label: 'Dark Mode', desc: 'Sleek.', icon: '🌙' },
+                                                { id: 'vintage', label: 'Vintage', desc: 'Nostálgico.', icon: '🕰️' },
+                                            ].map((themeOpt) => (
+                                                <div 
+                                                    key={themeOpt.id}
+                                                    onClick={() => setDesignData('theme', themeOpt.id)}
+                                                    className={`border-2 rounded-2xl p-4 cursor-pointer transition-all flex flex-col items-center text-center ${
+                                                        designData.theme === themeOpt.id 
+                                                        ? 'border-stone-900 bg-stone-50 shadow-sm' 
+                                                        : 'border-stone-200 hover:border-stone-300'
+                                                    }`}
+                                                >
+                                                    <div className="text-2xl mb-2">{themeOpt.icon}</div>
+                                                    <span className="font-medium text-stone-900 block text-sm mb-1">{themeOpt.label}</span>
+                                                    <span className="text-xs text-stone-500">{themeOpt.desc}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                    </div>
+
 
                                     {/* Animação com Preview Integrado */}
                                     <div className="pt-8 border-t border-stone-100">

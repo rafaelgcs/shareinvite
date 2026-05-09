@@ -23,6 +23,7 @@ class Event extends Model
         'text_color',
         'background_color',
         'animation_type',
+        'theme',
         'event_date',
         'status',
     ];

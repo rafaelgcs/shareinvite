@@ -12,12 +12,50 @@ interface Location {
 
 interface GoogleMapWidgetProps {
     locations: Location[];
+    layout?: 'tabs' | 'list';
 }
 
-export default function GoogleMapWidget({ locations }: GoogleMapWidgetProps) {
+export default function GoogleMapWidget({ locations, layout = 'tabs' }: GoogleMapWidgetProps) {
     const [activeLocation, setActiveLocation] = useState<Location | null>(locations[0] || null);
 
     if (locations.length === 0) return null;
+
+    if (layout === 'list') {
+        return (
+            <div className="space-y-8">
+                {locations.map((loc) => (
+                    <div key={loc.id} className="w-full rounded-3xl overflow-hidden bg-white shadow-lg border border-stone-100 flex flex-col md:flex-row">
+                        {/* Map Mini Placeholder */}
+                        <div className="w-full md:w-48 h-48 bg-stone-100 relative shrink-0">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <MapPin className="w-8 h-8 text-stone-300" />
+                            </div>
+                        </div>
+                        
+                        <div className="p-6 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 className="font-serif text-2xl text-stone-900 mb-2">{loc.name}</h4>
+                                <p className="text-stone-500 mb-4">{loc.address}</p>
+                                {loc.notes && (
+                                    <p className="text-sm text-stone-400 italic mb-4">"{loc.notes}"</p>
+                                )}
+                            </div>
+                            
+                            <a
+                                href={`https://maps.google.com/?q=${encodeURIComponent(loc.address)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 text-stone-900 font-medium hover:underline"
+                            >
+                                <MapPin className="w-4 h-4" />
+                                Abrir no Google Maps
+                            </a>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        );
+    }
 
     return (
         <div className="w-full max-w-2xl mx-auto rounded-3xl overflow-hidden bg-white shadow-xl border border-stone-100">
