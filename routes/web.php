@@ -7,6 +7,7 @@ use App\Http\Controllers\EventNoticeController;
 use App\Http\Controllers\EventGuideController;
 use App\Http\Controllers\PublicInvitationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -28,7 +29,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Event CRUD
     Route::get('/events/{event}/check-in', [EventController::class, 'checkIn'])->name('events.checkIn');
-    Route::post('/events/{event}/pay', [EventController::class, 'pay'])->name('events.pay');
+    Route::get('/events/{event}/checkout', [EventController::class, 'checkout'])->name('events.checkout');
+    Route::post('/events/{event}/pay', [StripeController::class, 'createSession'])->name('events.pay');
+    Route::get('/stripe/success/{event}', [StripeController::class, 'success'])->name('stripe.success');
     Route::resource('events', EventController::class);
     
     // Event Locations CRUD

@@ -113,12 +113,10 @@ export default function Dashboard({ events }) {
 
                                             {!evt.is_paid && (
                                                 <Link 
-                                                    href={route('events.pay', evt.id)} 
-                                                    method="post"
-                                                    as="button"
-                                                    className="w-full mb-4 py-3 bg-amber-500 text-amber-950 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-amber-400 transition-colors shadow-sm"
+                                                    href={route('events.checkout', evt.id)} 
+                                                    className="w-full mb-4 py-3 bg-amber-500 text-amber-950 text-xs font-bold uppercase tracking-widest rounded-xl hover:bg-amber-400 transition-colors shadow-sm flex items-center justify-center"
                                                 >
-                                                    Liberar Convite (Pagar)
+                                                    Liberar Convite (Checkout)
                                                 </Link>
                                             )}
 

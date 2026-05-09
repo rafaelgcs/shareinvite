@@ -185,6 +185,17 @@ class EventController extends Controller
         return response()->stream($callback, 200, $headers);
     }
 
+    public function checkout(Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return Inertia::render('Events/Checkout', [
+            'event' => $event,
+        ]);
+    }
+
     public function pay(Event $event)
     {
         if ($event->user_id !== auth()->id()) {
@@ -196,6 +207,6 @@ class EventController extends Controller
             'status' => 'active'
         ]);
 
-        return back()->with('success', 'Evento liberado com sucesso!');
+        return redirect()->route('dashboard')->with('success', 'Evento liberado com sucesso!');
     }
 }
