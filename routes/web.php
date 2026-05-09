@@ -41,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/events/{event}/guides', [EventGuideController::class, 'store'])->name('events.guides.store');
     Route::delete('/events/{event}/guides/{guide}', [EventGuideController::class, 'destroy'])->name('events.guides.destroy');
     
+    // Guest Check-in
+    Route::post('/guests/{uuid}/check-in', [\App\Http\Controllers\Api\CheckInController::class, 'store'])->name('guests.checkIn.store');
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

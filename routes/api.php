@@ -12,7 +12,4 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/events/{event}/rsvp', [RsvpController::class, 'store']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/guests/{uuid}', [CheckInController::class, 'show']);
-    Route::post('/guests/{uuid}/check-in', [CheckInController::class, 'store']);
-});
+Route::post('/events/{event}/rsvp', [RsvpController::class, 'store']);

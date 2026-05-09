@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import { Html5Qrcode } from 'html5-qrcode';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Loader2, Camera, ShieldCheck, UserCheck, Users, Calendar } from 'lucide-react';
+import axios from 'axios';
 
 interface CheckInProps {
     event: {
@@ -18,34 +19,67 @@ export default function CheckIn({ event }: CheckInProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isScanning, setIsScanning] = useState(false);
+    const scannerRef = React.useRef<Html5Qrcode | null>(null);
 
     useEffect(() => {
-        let scanner: Html5QrcodeScanner | null = null;
+        const reader = document.getElementById("reader");
+        if (!reader) return;
 
-        if (isScanning && !scanResult) {
-            scanner = new Html5QrcodeScanner(
-                "reader",
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                /* verbose= */ false
-            );
-
-            scanner.render(onScanSuccess, onScanFailure);
+        if (!scannerRef.current) {
+            scannerRef.current = new Html5Qrcode("reader");
         }
 
-        return () => {
-            if (scanner) {
-                scanner.clear().catch(error => console.error("Failed to clear scanner", error));
+        const startScanner = async () => {
+            if (isScanning && !scanResult && !loading) {
+                try {
+                    // Stop if already scanning for some reason
+                    if (scannerRef.current?.isScanning) {
+                        await scannerRef.current.stop();
+                    }
+
+                    await scannerRef.current?.start(
+                        { facingMode: "environment" },
+                        { 
+                            fps: 10, 
+                            qrbox: { width: 250, height: 250 },
+                            aspectRatio: 1.0
+                        },
+                        onScanSuccess,
+                        onScanFailure
+                    );
+                } catch (err) {
+                    console.error("Scanner start error:", err);
+                    setError("Não foi possível acessar a câmera.");
+                    setIsScanning(false);
+                }
+            } else {
+                if (scannerRef.current?.isScanning) {
+                    try {
+                        await scannerRef.current.stop();
+                    } catch (e) {
+                        console.warn("Stop error:", e);
+                    }
+                }
             }
         };
-    }, [isScanning, scanResult]);
+
+        startScanner();
+
+        return () => {
+            // No need to stop here as we handle it in startScanner logic
+        };
+    }, [isScanning, scanResult, loading]);
 
     async function onScanSuccess(decodedText: string) {
+        if (scannerRef.current?.isScanning) {
+            await scannerRef.current.stop();
+        }
         setIsScanning(false);
         handleCheckIn(decodedText);
     }
 
     function onScanFailure(error: any) {
-        // console.warn(`Code scan error = ${error}`);
+        // Quiet failure for standard scan ticks
     }
 
     const handleCheckIn = async (uuid: string) => {
@@ -54,32 +88,27 @@ export default function CheckIn({ event }: CheckInProps) {
         setScanResult(null);
 
         try {
-            const response = await fetch(`/api/guests/${uuid}/check-in`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
+            const response = await axios.post(`/guests/${uuid}/check-in`);
+            const data = response.data;
+
+            setScanResult({
+                success: true,
+                guest: data.guest,
+                message: data.message
             });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                setScanResult({
-                    success: true,
-                    guest: data.guest,
-                    message: data.message
-                });
-            } else {
+        } catch (err: any) {
+            if (err.response) {
+                const data = err.response.data;
                 setScanResult({
                     success: false,
                     guest: data.guest,
                     message: data.message,
                     alreadyCheckedIn: data.already_checked_in
                 });
+            } else {
+                console.error("Check-in error:", err);
+                setError('Erro ao processar o check-in. Verifique sua conexão.');
             }
-        } catch (err) {
-            setError('Erro ao processar o check-in. Verifique sua conexão.');
         } finally {
             setLoading(false);
         }
@@ -119,6 +148,21 @@ export default function CheckIn({ event }: CheckInProps) {
                                 <p className="text-stone-500 text-sm mt-2">Aponte a câmera para o QR Code do convidado</p>
                             </div>
 
+                            {/* Persistent Scanner Container */}
+                            <div 
+                                id="reader" 
+                                className={`overflow-hidden rounded-2xl border-2 border-stone-200 bg-stone-50 min-h-[300px] mb-6 ${isScanning && !scanResult && !loading ? 'block' : 'hidden'}`}
+                            ></div>
+
+                            {isScanning && !scanResult && !loading && (
+                                <button
+                                    onClick={() => setIsScanning(false)}
+                                    className="mb-8 text-stone-400 text-sm hover:text-stone-600 underline"
+                                >
+                                    Cancelar Scanner
+                                </button>
+                            )}
+
                             <AnimatePresence mode="wait">
                                 {!isScanning && !scanResult && !loading && (
                                     <motion.div
@@ -151,24 +195,6 @@ export default function CheckIn({ event }: CheckInProps) {
                                                 </span>
                                             </div>
                                         </div>
-                                    </motion.div>
-                                )}
-
-                                {isScanning && !scanResult && (
-                                    <motion.div
-                                        key="scanner"
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        className="relative"
-                                    >
-                                        <div id="reader" className="overflow-hidden rounded-2xl border-2 border-stone-200 bg-stone-50"></div>
-                                        <button
-                                            onClick={() => setIsScanning(false)}
-                                            className="mt-6 text-stone-400 text-sm hover:text-stone-600 underline"
-                                        >
-                                            Cancelar
-                                        </button>
                                     </motion.div>
                                 )}
 
