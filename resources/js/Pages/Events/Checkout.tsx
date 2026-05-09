@@ -100,74 +100,44 @@ export default function Checkout({ event }) {
                                 ))}
                             </div>
 
-                            {/* Payment Form Mockup */}
-                            <div className="bg-white rounded-[3rem] p-8 border border-stone-100 shadow-sm">
-                                <div className="flex items-center justify-between mb-8">
-                                    <h3 className="text-xl font-bold text-stone-900 flex items-center gap-2">
-                                        <CreditCard className="w-6 h-6" /> Detalhes do Pagamento
-                                    </h3>
-                                    <div className="flex gap-2">
-                                        <div className="w-10 h-6 bg-stone-100 rounded border border-stone-200" />
-                                        <div className="w-10 h-6 bg-stone-100 rounded border border-stone-200" />
+                            {/* Payment Redirect Info */}
+                            <div className="bg-white rounded-[3rem] p-10 border border-stone-100 shadow-xl text-center">
+                                <div className="w-20 h-20 bg-stone-900 text-white rounded-full flex items-center justify-center mx-auto mb-8 shadow-2xl">
+                                    <Lock className="w-10 h-10" />
+                                </div>
+                                
+                                <h3 className="text-2xl font-serif text-stone-900 mb-4">Pagamento Seguro via Stripe</h3>
+                                <p className="text-stone-500 mb-8 max-w-sm mx-auto leading-relaxed">
+                                    Você será redirecionado para o ambiente seguro do Stripe para concluir o pagamento via <span className="font-bold text-stone-900">Cartão de Crédito</span> ou <span className="font-bold text-stone-900">PIX</span>.
+                                </p>
+
+                                <div className="grid grid-cols-2 gap-4 mb-8">
+                                    <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100 flex flex-col items-center gap-2">
+                                        <CreditCard className="w-6 h-6 text-stone-400" />
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">Cartão</span>
+                                    </div>
+                                    <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100 flex flex-col items-center gap-2">
+                                        <div className="w-6 h-6 bg-stone-900 text-white rounded flex items-center justify-center text-[8px] font-bold">PIX</div>
+                                        <span className="text-[10px] font-bold uppercase tracking-widest">PIX</span>
                                     </div>
                                 </div>
 
-                                <form onSubmit={handlePayment} className="space-y-6">
-                                    <div className="space-y-4">
-                                        <div>
-                                            <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">Número do Cartão</label>
-                                            <div className="relative">
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="0000 0000 0000 0000" 
-                                                    className="w-full bg-stone-50 border-stone-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-stone-900 outline-none"
-                                                    disabled
-                                                />
-                                                <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" />
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">Expiração</label>
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="MM/YY" 
-                                                    className="w-full bg-stone-50 border-stone-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-stone-900 outline-none"
-                                                    disabled
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="text-xs font-bold text-stone-400 uppercase tracking-wider mb-2 block">CVC</label>
-                                                <input 
-                                                    type="text" 
-                                                    placeholder="123" 
-                                                    className="w-full bg-stone-50 border-stone-100 rounded-2xl p-4 text-sm focus:ring-2 focus:ring-stone-900 outline-none"
-                                                    disabled
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-6 border-t border-stone-50">
-                                        <div className="flex items-center gap-4 text-stone-400 mb-8">
-                                            <ShieldCheck className="w-8 h-8" />
-                                            <p className="text-xs font-light">Seu pagamento é processado de forma segura e criptografada. Ambiente de demonstração.</p>
-                                        </div>
-
-                                        <button
-                                            type="submit"
-                                            disabled={processing}
-                                            className="w-full py-5 bg-stone-900 text-white rounded-full text-lg font-bold shadow-2xl hover:bg-stone-800 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                                        >
-                                            {processing ? 'Processando...' : (
-                                                <>
-                                                    Pagar R$ {plans.find(p => p.id === selectedPlan)?.price} <Zap className="w-5 h-5 fill-white" />
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
-                                </form>
+                                <button
+                                    onClick={handlePayment}
+                                    disabled={processing}
+                                    className="w-full py-6 bg-stone-900 text-white rounded-full text-xl font-bold shadow-2xl hover:bg-stone-800 transition-all flex items-center justify-center gap-3 disabled:opacity-50 group"
+                                >
+                                    {processing ? 'Redirecionando...' : (
+                                        <>
+                                            Ir para Pagamento <Zap className="w-5 h-5 fill-white group-hover:scale-125 transition-transform" />
+                                        </>
+                                    )}
+                                </button>
+                                
+                                <div className="mt-8 flex items-center justify-center gap-4 text-stone-300">
+                                    <ShieldCheck className="w-5 h-5" />
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">Ambiente 100% Seguro</span>
+                                </div>
                             </div>
                         </div>
 
