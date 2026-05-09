@@ -92,7 +92,27 @@ class EventController extends Controller
             'primary_color' => 'required|string|max:20',
             'secondary_color' => 'required|string|max:20',
             'animation_type' => 'required|string|in:envelope_3d,fade_in,gate_fold,slipcase,wax_seal',
+            'cover_image' => 'nullable|image|max:15360', // 15MB max (will be compressed)
+            'logo' => 'nullable|image|max:15360', // 15MB max (will be compressed)
         ]);
+
+        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+
+        if ($request->hasFile('cover_image')) {
+            $image = $manager->decodePath($request->file('cover_image')->getRealPath());
+            $image->scaleDown(width: 1080); // resize down to max 1080px width
+            $filename = 'events/cover_' . uniqid() . '.webp';
+            $image->save(storage_path('app/public/' . $filename), 80);
+            $validated['cover_image'] = '/storage/' . $filename;
+        }
+
+        if ($request->hasFile('logo')) {
+            $image = $manager->decodePath($request->file('logo')->getRealPath());
+            $image->scaleDown(width: 600); // resize down to max 600px width
+            $filename = 'events/logo_' . uniqid() . '.webp';
+            $image->save(storage_path('app/public/' . $filename), 80);
+            $validated['logo'] = '/storage/' . $filename;
+        }
 
         $event->update($validated);
 

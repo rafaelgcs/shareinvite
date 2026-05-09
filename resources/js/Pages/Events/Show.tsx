@@ -7,19 +7,27 @@ import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import DangerButton from '@/Components/DangerButton';
+import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 
 export default function Show({ event }) {
     const [activeTab, setActiveTab] = useState('settings');
+    const [previewKey, setPreviewKey] = useState(0);
 
-    const { data: designData, setData: setDesignData, put: putDesign, processing: processingDesign, recentlySuccessful: designSuccess } = useForm({
+    const { data: designData, setData: setDesignData, post: postDesign, processing: processingDesign, recentlySuccessful: designSuccess } = useForm({
+        _method: 'put',
         primary_color: event.primary_color || '#1c1917',
         secondary_color: event.secondary_color || '#fafaf9',
         animation_type: event.animation_type || 'envelope_3d',
+        cover_image: null,
+        logo: null,
     });
 
     const submitDesign = (e) => {
         e.preventDefault();
-        putDesign(route('events.updateDesign', event.id));
+        postDesign(route('events.updateDesign', event.id), {
+            forceFormData: true,
+            preserveScroll: true,
+        });
     };
 
     const { data: locData, setData: setLocData, post: postLoc, processing: locProcessing, reset: resetLoc } = useForm({
@@ -195,7 +203,10 @@ export default function Show({ event }) {
                                                 ].map((anim) => (
                                                     <div 
                                                         key={anim.id}
-                                                        onClick={() => setDesignData('animation_type', anim.id)}
+                                                        onClick={() => {
+                                                            setDesignData('animation_type', anim.id);
+                                                            setPreviewKey(prev => prev + 1);
+                                                        }}
                                                         className={`border-2 rounded-2xl p-4 cursor-pointer transition-all ${
                                                             designData.animation_type === anim.id 
                                                             ? 'border-stone-900 bg-stone-50' 
@@ -216,55 +227,92 @@ export default function Show({ event }) {
                                             </div>
 
                                             {/* Preview Simulator */}
-                                            <div className="bg-stone-100 rounded-3xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden h-[400px]">
-                                                <div className="absolute inset-0 bg-gradient-to-br from-stone-200 to-stone-100 opacity-50" />
-                                                <p className="text-stone-400 font-serif text-sm uppercase tracking-widest mb-6 relative z-10">Preview da Abertura</p>
-                                                
-                                                {/* Mini Iframe/Mock to preview the animation - simulating logic */}
-                                                <div 
-                                                    className="w-full max-w-[200px] aspect-[9/16] rounded-xl shadow-2xl relative z-10 flex items-center justify-center"
-                                                    style={{ backgroundColor: designData.secondary_color }}
+                                            <div className="bg-stone-100 rounded-3xl flex flex-col items-center justify-center text-center relative overflow-hidden h-[400px]">
+                                                <EnvelopeAnimation 
+                                                    key={previewKey}
+                                                    isPreview={true}
+                                                    animationType={designData.animation_type}
+                                                    primaryColor={designData.primary_color}
+                                                    secondaryColor={designData.secondary_color}
+                                                    title={event.title}
+                                                    logo={designData.logo ? URL.createObjectURL(designData.logo) : event.logo}
                                                 >
-                                                    <motion.div 
-                                                        key={designData.animation_type}
-                                                        initial={{ scale: 0.8, opacity: 0 }}
-                                                        animate={{ scale: 1, opacity: 1 }}
-                                                        transition={{ duration: 0.5 }}
-                                                        className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-2xl shadow-lg border"
-                                                        style={{ 
-                                                            backgroundColor: designData.primary_color, 
-                                                            borderColor: designData.primary_color,
-                                                            color: designData.secondary_color 
-                                                        }}
-                                                    >
-                                                        {event.title?.[0] || 'M'}
-                                                    </motion.div>
-                                                </div>
+                                                    <div className="w-full h-full flex items-center justify-center bg-white p-4 text-xs font-serif text-stone-400 text-center">
+                                                        Este é o conteúdo do convite (RSVP, Endereços, etc).
+                                                    </div>
+                                                </EnvelopeAnimation>
                                                 
-                                                <p className="text-stone-500 text-xs mt-6 relative z-10">O convite real possui a física 3D completa.</p>
+                                                <div className="absolute top-4 left-0 right-0 z-50 pointer-events-none">
+                                                    <p className="text-stone-900 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full inline-block font-serif text-xs uppercase tracking-widest shadow-sm">Preview Interativo</p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Imagens (Placeholder) */}
+                                    {/* Imagens */}
                                     <div className="pt-8 border-t border-stone-100">
                                         <h3 className="font-serif text-2xl text-stone-900 mb-2">Imagens do Convite</h3>
                                         <p className="text-stone-500 mb-6">Configure as imagens que aparecerão no envelope e na capa principal.</p>
                                         <div className="grid md:grid-cols-2 gap-8">
-                                            <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
-                                                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
-                                                    <ImageIcon className="w-8 h-8 text-stone-400" />
-                                                </div>
-                                                <p className="font-medium text-stone-900">Upload Capa Principal</p>
-                                                <p className="text-sm text-stone-500 mt-1">Recomendado: 1080x1920px (Vertical)</p>
-                                            </div>
-                                            <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
-                                                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-serif font-bold text-2xl text-stone-300">
-                                                    {event.title?.[0] || 'M'}
-                                                </div>
-                                                <p className="font-medium text-stone-900">Upload do Monograma/Selo</p>
-                                                <p className="text-sm text-stone-500 mt-1">Será usado no selo de cera e capa.</p>
-                                            </div>
+                                            {/* Cover Image Upload */}
+                                            <label className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer relative overflow-hidden group min-h-[250px]">
+                                                <input 
+                                                    type="file" 
+                                                    className="hidden" 
+                                                    accept="image/*"
+                                                    onChange={e => setDesignData('cover_image', e.target.files[0])}
+                                                />
+                                                {(designData.cover_image || event.cover_image) ? (
+                                                    <>
+                                                        <img 
+                                                            src={designData.cover_image ? URL.createObjectURL(designData.cover_image) : event.cover_image} 
+                                                            alt="Capa" 
+                                                            className="absolute inset-0 w-full h-full object-cover opacity-80 group-hover:opacity-50 transition-opacity"
+                                                        />
+                                                        <div className="relative z-10 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-medium text-sm text-stone-900 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            Trocar Capa
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
+                                                            <ImageIcon className="w-8 h-8 text-stone-400" />
+                                                        </div>
+                                                        <p className="font-medium text-stone-900">Upload Capa Principal</p>
+                                                        <p className="text-sm text-stone-500 mt-1">Recomendado: 1080x1920px (Vertical)</p>
+                                                    </>
+                                                )}
+                                            </label>
+
+                                            {/* Logo/Seal Upload */}
+                                            <label className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer relative overflow-hidden group min-h-[250px]">
+                                                <input 
+                                                    type="file" 
+                                                    className="hidden" 
+                                                    accept="image/*"
+                                                    onChange={e => setDesignData('logo', e.target.files[0])}
+                                                />
+                                                {(designData.logo || event.logo) ? (
+                                                    <>
+                                                        <img 
+                                                            src={designData.logo ? URL.createObjectURL(designData.logo) : event.logo} 
+                                                            alt="Logo" 
+                                                            className="absolute inset-0 w-full h-full object-contain p-8 opacity-80 group-hover:opacity-50 transition-opacity"
+                                                        />
+                                                        <div className="relative z-10 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full font-medium text-sm text-stone-900 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                                                            Trocar Monograma
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-serif font-bold text-2xl text-stone-300">
+                                                            {event.title?.[0] || 'M'}
+                                                        </div>
+                                                        <p className="font-medium text-stone-900">Upload do Monograma/Selo</p>
+                                                        <p className="text-sm text-stone-500 mt-1">Será usado no selo de cera e capa (Fundo transparente).</p>
+                                                    </>
+                                                )}
+                                            </label>
                                         </div>
                                     </div>
 
