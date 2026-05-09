@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('event_id')->constrained()->onDelete('cascade');
             $table->text('message');
-            $table->enum('priority', ['low', 'high'])->default('low');
+            $table->enum('priority', ['low', 'normal', 'high'])->default('normal');
             $table->timestamps();
         });
     }
