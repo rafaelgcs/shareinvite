@@ -111,7 +111,7 @@ export default function DarkTheme({ event, locations, guides = [] }: ThemeProps)
                         <h2 className="text-4xl font-serif mb-2">Confirmar</h2>
                         <p className="text-stone-400 uppercase tracking-widest text-xs">Aguardamos por você</p>
                     </div>
-                    <RsvpForm eventId={event.id} />
+                    <RsvpForm eventId={event.id} allowExtraGuests={event.allow_extra_guests} maxExtraGuests={event.max_extra_guests} />
                 </motion.div>
             </section>
         </div>

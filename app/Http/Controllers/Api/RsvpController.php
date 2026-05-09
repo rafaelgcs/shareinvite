@@ -10,13 +10,15 @@ class RsvpController extends Controller
 {
     public function store(Request $request, Event $event)
     {
+        $maxExtra = $event->allow_extra_guests ? $event->max_extra_guests : 0;
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
-            'extra_guests' => 'nullable|integer|min:0|max:10',
+            'extra_guests' => 'nullable|integer|min:0|max:' . $maxExtra,
         ]);
 
-        $extraGuests = $validated['extra_guests'] ?? 0;
+        $extraGuests = $event->allow_extra_guests ? ($validated['extra_guests'] ?? 0) : 0;
         $totalNewGuests = 1 + $extraGuests; // The guest themselves + their extra guests
 
         // Calculate current total confirmed guests

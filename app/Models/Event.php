@@ -27,6 +27,8 @@ class Event extends Model
         'event_date',
         'rsvp_enabled',
         'rsvp_deadline',
+        'allow_extra_guests',
+        'max_extra_guests',
         'status',
     ];
 
@@ -34,6 +36,8 @@ class Event extends Model
         'event_date' => 'datetime',
         'rsvp_deadline' => 'date',
         'rsvp_enabled' => 'boolean',
+        'allow_extra_guests' => 'boolean',
+        'max_extra_guests' => 'integer',
     ];
 
     public function user(): BelongsTo

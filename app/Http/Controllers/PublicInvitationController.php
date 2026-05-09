@@ -28,6 +28,8 @@ class PublicInvitationController extends Controller
                 'theme' => $event->theme,
                 'rsvp_enabled' => $event->rsvp_enabled,
                 'rsvp_deadline' => $event->rsvp_deadline ? $event->rsvp_deadline->format('Y-m-d') : null,
+                'allow_extra_guests' => $event->allow_extra_guests,
+                'max_extra_guests' => $event->max_extra_guests,
             ],
             'locations' => $event->locations,
             'notices' => $event->notices,

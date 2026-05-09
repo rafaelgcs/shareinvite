@@ -109,7 +109,7 @@ export default function ModernTheme({ event, locations, guides = [] }: ThemeProp
                         <h2 className="text-3xl font-light text-stone-900 mb-4 tracking-tight">Confirmar Presença</h2>
                         <p className="text-stone-400 text-sm uppercase tracking-widest">RSVP</p>
                     </div>
-                    <RsvpForm eventId={event.id} />
+                    <RsvpForm eventId={event.id} allowExtraGuests={event.allow_extra_guests} maxExtraGuests={event.max_extra_guests} />
                 </motion.div>
             </section>
         </div>

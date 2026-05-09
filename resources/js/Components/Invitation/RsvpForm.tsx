@@ -2,9 +2,11 @@ import { useState } from 'react';
 
 interface RsvpFormProps {
     eventId: number;
+    allowExtraGuests?: boolean;
+    maxExtraGuests?: number;
 }
 
-export default function RsvpForm({ eventId }: RsvpFormProps) {
+export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGuests = 5 }: RsvpFormProps) {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [extraGuests, setExtraGuests] = useState(0);
@@ -91,20 +93,22 @@ export default function RsvpForm({ eventId }: RsvpFormProps) {
                     />
                 </div>
 
-                <div>
-                    <label className="block text-sm font-medium text-stone-700 mb-1">Acompanhantes</label>
-                    <select
-                        value={extraGuests}
-                        onChange={(e) => setExtraGuests(Number(e.target.value))}
-                        className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none transition-all bg-white"
-                    >
-                        {[0, 1, 2, 3, 4, 5].map((num) => (
-                            <option key={num} value={num}>
-                                {num === 0 ? 'Nenhum' : `${num} acompanhante${num > 1 ? 's' : ''}`}
-                            </option>
-                        ))}
-                    </select>
-                </div>
+                {allowExtraGuests && (
+                    <div>
+                        <label className="block text-sm font-medium text-stone-700 mb-1">Acompanhantes</label>
+                        <select
+                            value={extraGuests}
+                            onChange={(e) => setExtraGuests(Number(e.target.value))}
+                            className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none transition-all bg-white"
+                        >
+                            {Array.from({ length: maxExtraGuests + 1 }, (_, i) => i).map((num) => (
+                                <option key={num} value={num}>
+                                    {num === 0 ? 'Nenhum' : `${num} acompanhante${num > 1 ? 's' : ''}`}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                )}
 
                 <button
                     type="submit"

@@ -97,6 +97,8 @@ class EventController extends Controller
             'theme' => 'required|string|in:classic,modern,floral,dark,vintage',
             'rsvp_enabled' => 'required|boolean',
             'rsvp_deadline' => 'nullable|date',
+            'allow_extra_guests' => 'required|boolean',
+            'max_extra_guests' => 'required|integer|min:0|max:10',
             'cover_image' => 'nullable|image|max:15360', // 15MB max (will be compressed)
             'logo' => 'nullable|image|max:15360', // 15MB max (will be compressed)
         ]);

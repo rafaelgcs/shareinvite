@@ -23,6 +23,8 @@ export default function Show({ event }) {
         theme: event.theme || 'classic',
         rsvp_enabled: event.rsvp_enabled ?? true,
         rsvp_deadline: event.rsvp_deadline || '',
+        allow_extra_guests: event.allow_extra_guests ?? true,
+        max_extra_guests: event.max_extra_guests ?? 5,
         cover_image: null,
         logo: null,
     });
@@ -408,6 +410,39 @@ export default function Show({ event }) {
                                                             onChange={e => setDesignData('rsvp_deadline', e.target.value)}
                                                         />
                                                         <p className="mt-2 text-xs text-stone-500 italic">Após esta data, o botão de confirmação ficará desabilitado no convite.</p>
+                                                    </div>
+
+                                                    <div className="mt-8 pt-8 border-t border-stone-100 grid md:grid-cols-2 gap-8">
+                                                        <div className="flex items-center justify-between p-4 bg-white rounded-2xl border border-stone-200 shadow-sm">
+                                                            <div>
+                                                                <InputLabel value="Permitir Acompanhantes" />
+                                                                <p className="text-xs text-stone-500">Habilita o campo de convidados extras.</p>
+                                                            </div>
+                                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                                <input 
+                                                                    type="checkbox" 
+                                                                    className="sr-only peer" 
+                                                                    checked={designData.allow_extra_guests}
+                                                                    onChange={e => setDesignData('allow_extra_guests', e.target.checked)}
+                                                                />
+                                                                <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-900"></div>
+                                                            </label>
+                                                        </div>
+
+                                                        {designData.allow_extra_guests && (
+                                                            <div className="p-4 bg-white rounded-2xl border border-stone-200 shadow-sm">
+                                                                <InputLabel value="Máximo de Acompanhantes" />
+                                                                <select 
+                                                                    className="mt-1 block w-full px-4 py-2.5 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none bg-stone-50 text-sm"
+                                                                    value={designData.max_extra_guests}
+                                                                    onChange={e => setDesignData('max_extra_guests', parseInt(e.target.value))}
+                                                                >
+                                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(n => (
+                                                                        <option key={n} value={n}>{n} acompanhante{n > 1 ? 's' : ''}</option>
+                                                                    ))}
+                                                                </select>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </motion.div>
                                             )}

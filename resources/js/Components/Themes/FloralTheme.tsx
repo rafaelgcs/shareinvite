@@ -126,7 +126,7 @@ export default function FloralTheme({ event, locations, guides = [] }: ThemeProp
                         <p className="text-stone-400 tracking-widest uppercase text-sm font-light">Por favor, confirme até 15 dias antes</p>
                     </div>
                     <div className="bg-white rounded-3xl p-8 md:p-12 text-stone-900 shadow-2xl">
-                        <RsvpForm eventId={event.id} />
+                        <RsvpForm eventId={event.id} allowExtraGuests={event.allow_extra_guests} maxExtraGuests={event.max_extra_guests} />
                     </div>
                 </div>
             </section>
