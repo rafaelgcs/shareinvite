@@ -140,4 +140,47 @@ class EventController extends Controller
             'event' => $event,
         ]);
     }
+
+    public function exportGuests(Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $guests = $event->guests()->latest()->get();
+        
+        $filename = "lista-presenca-" . Str::slug($event->title) . "-" . now()->format('Y-m-d') . ".csv";
+        
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $callback = function() use ($guests) {
+            $file = fopen('php://output', 'w');
+            // UTF-8 BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            
+            fputcsv($file, ['Nome', 'Email', 'Telefone', 'Acompanhantes', 'Data Confirmação', 'Status Entrada', 'Hora Entrada']);
+
+            foreach ($guests as $guest) {
+                fputcsv($file, [
+                    $guest->name,
+                    $guest->email,
+                    $guest->phone,
+                    $guest->extra_guests,
+                    $guest->confirmed_at ? $guest->confirmed_at->format('d/m/Y H:i') : '-',
+                    $guest->checked_in_at ? 'Presente' : 'Aguardando',
+                    $guest->checked_in_at ? $guest->checked_in_at->format('H:i') : '-'
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

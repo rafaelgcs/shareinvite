@@ -43,6 +43,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     // Guest Check-in
     Route::post('/guests/{uuid}/check-in', [\App\Http\Controllers\Api\CheckInController::class, 'store'])->name('guests.checkIn.store');
+    Route::delete('/guests/{guest}', [\App\Http\Controllers\GuestController::class, 'destroy'])->name('guests.destroy');
+    Route::get('/events/{event}/guests/export', [EventController::class, 'exportGuests'])->name('events.guests.export');
 
     // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

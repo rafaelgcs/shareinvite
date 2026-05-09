@@ -158,6 +158,12 @@ export default function Show({ event }) {
         }
     };
 
+    const deleteGuest = (id) => {
+        if (confirm('Remover convidado da lista? Esta ação não pode ser desfeita.')) {
+            router.delete(route('guests.destroy', id));
+        }
+    };
+
     const deleteLocation = (id) => {
         if (confirm('Remover local?')) {
             router.delete(route('events.locations.destroy', [event.id, id]));
@@ -915,9 +921,18 @@ export default function Show({ event }) {
 
                         {activeTab === 'guests' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <div>
-                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Lista de Presença (RSVP)</h3>
-                                    <p className="text-stone-500">Acompanhe quem confirmou presença no seu evento.</p>
+                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                    <div>
+                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Lista de Presença (RSVP)</h3>
+                                        <p className="text-stone-500">Acompanhe quem confirmou presença no seu evento.</p>
+                                    </div>
+                                    <a 
+                                        href={route('events.guests.export', event.id)}
+                                        className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-stone-200 rounded-xl text-sm font-bold text-stone-700 hover:bg-stone-50 transition-all shadow-sm"
+                                    >
+                                        <Download className="w-4 h-4" />
+                                        Exportar Lista (CSV)
+                                    </a>
                                 </div>
                                 <div className="mt-8 overflow-x-auto border border-stone-200 rounded-2xl">
                                     <table className="w-full text-left text-sm text-stone-600">
@@ -927,6 +942,7 @@ export default function Show({ event }) {
                                                 <th className="px-6 py-4 text-center">Acompanhantes</th>
                                                 <th className="px-6 py-4">Data da Confirmação</th>
                                                 <th className="px-6 py-4">Status de Entrada</th>
+                                                <th className="px-6 py-4 text-right">Ações</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -964,20 +980,31 @@ export default function Show({ event }) {
                                                                     </span>
                                                                 </div>
                                                             ) : (
-                                                                <div className="flex items-center gap-2">
-                                                                    <div className="flex items-center gap-2 text-stone-300">
-                                                                        <Clock className="w-4 h-4" />
-                                                                        <span className="text-xs font-bold uppercase tracking-wider">Aguardando</span>
-                                                                    </div>
+                                                                <div className="flex items-center gap-2 text-stone-300">
+                                                                    <Clock className="w-4 h-4" />
+                                                                    <span className="text-xs font-bold uppercase tracking-wider">Aguardando</span>
+                                                                </div>
+                                                            )}
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="flex items-center justify-end gap-2">
+                                                                {!guest.checked_in_at && (
                                                                     <button 
                                                                         onClick={() => handleOpenSharing(guest)}
-                                                                        className="ml-auto p-2 text-stone-400 hover:text-stone-900 transition-colors"
+                                                                        className="p-2 text-stone-400 hover:text-stone-900 transition-colors"
                                                                         title="Compartilhar Convite"
                                                                     >
                                                                         <Share2 className="w-4 h-4" />
                                                                     </button>
-                                                                </div>
-                                                            )}
+                                                                )}
+                                                                <button 
+                                                                    onClick={() => deleteGuest(guest.id)}
+                                                                    className="p-2 text-red-400 hover:text-red-600 transition-colors"
+                                                                    title="Excluir Convidado"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </button>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 ))
