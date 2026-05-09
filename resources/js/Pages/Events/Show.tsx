@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
-import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock, Share2, Download, X } from 'lucide-react';
+import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock, Share2, Download, X, FileText, Upload } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import DigitalTicket from '@/Components/Invitation/DigitalTicket';
 import html2canvas from 'html2canvas';
@@ -142,6 +142,7 @@ export default function Show({ event }) {
         title: '',
         content: '',
         type: 'other',
+        file: null as File | null,
     });
 
     const submitGuide = (e) => {
@@ -829,6 +830,34 @@ export default function Show({ event }) {
                                                     placeholder="Descreva as orientações aqui..."
                                                 ></textarea>
                                             </div>
+
+                                            <div className="md:col-span-2">
+                                                <InputLabel value="Anexo (Imagem ou PDF)" />
+                                                <div className="mt-2 flex items-center gap-4">
+                                                    <label className="flex items-center gap-2 px-4 py-2 bg-white border border-stone-200 rounded-xl cursor-pointer hover:bg-stone-50 transition-colors shadow-sm">
+                                                        <Upload className="w-4 h-4 text-stone-500" />
+                                                        <span className="text-sm text-stone-600">
+                                                            {guideData.file ? guideData.file.name : 'Selecionar arquivo...'}
+                                                        </span>
+                                                        <input 
+                                                            type="file" 
+                                                            className="hidden" 
+                                                            accept="image/*,.pdf"
+                                                            onChange={e => setGuideData('file', e.target.files?.[0] || null)}
+                                                        />
+                                                    </label>
+                                                    {guideData.file && (
+                                                        <button 
+                                                            type="button"
+                                                            onClick={() => setGuideData('file', null)}
+                                                            className="text-xs text-red-500 hover:underline"
+                                                        >
+                                                            Remover
+                                                        </button>
+                                                    )}
+                                                </div>
+                                                <p className="mt-1 text-xs text-stone-400 italic">Opcional. Ideal para mapas, inspirações de traje ou manuais detalhados.</p>
+                                            </div>
                                         </div>
                                         <PrimaryButton disabled={guideProcessing}>Adicionar Guia</PrimaryButton>
                                     </form>
@@ -854,6 +883,28 @@ export default function Show({ event }) {
                                                     </div>
                                                     <h4 className="font-serif text-xl text-stone-900 mb-3">{guide.title}</h4>
                                                     <p className="text-stone-600 text-sm whitespace-pre-wrap">{guide.content}</p>
+                                                    
+                                                    {guide.file_path && (
+                                                        <div className="mt-4 pt-4 border-t border-stone-100">
+                                                            <a 
+                                                                href={guide.file_path} 
+                                                                target="_blank" 
+                                                                className="flex items-center gap-2 text-stone-900 hover:text-stone-600 transition-colors group"
+                                                            >
+                                                                <div className="w-10 h-10 bg-stone-50 rounded-lg flex items-center justify-center group-hover:bg-stone-100">
+                                                                    {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                                        <FileText className="w-5 h-5 text-red-500" />
+                                                                    ) : (
+                                                                        <ImageIcon className="w-5 h-5 text-blue-500" />
+                                                                    )}
+                                                                </div>
+                                                                <div className="text-left">
+                                                                    <p className="text-xs font-bold uppercase tracking-wider">Ver Anexo</p>
+                                                                    <p className="text-[10px] text-stone-400">Clique para abrir</p>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
                                         ))}

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
+import { FileText, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeProps {
     event: any;
@@ -91,6 +92,28 @@ export default function ClassicTheme({ event, locations, guides = [] }: ThemePro
                                     </span>
                                     <h3 className="font-serif text-2xl text-stone-900 mb-4">{guide.title}</h3>
                                     <p className="text-stone-600 leading-relaxed whitespace-pre-wrap">{guide.content}</p>
+
+                                    {guide.file_path && (
+                                        <div className="mt-6 pt-6 border-t border-stone-100">
+                                            <a 
+                                                href={guide.file_path} 
+                                                target="_blank" 
+                                                className="flex items-center gap-3 p-3 bg-stone-50 rounded-2xl hover:bg-stone-100 transition-all group"
+                                            >
+                                                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
+                                                    {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                        <FileText className="w-6 h-6 text-red-500" />
+                                                    ) : (
+                                                        <ImageIcon className="w-6 h-6 text-blue-500" />
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="text-xs font-bold text-stone-900 uppercase tracking-widest">Ver Anexo</p>
+                                                    <p className="text-[10px] text-stone-400">PDF ou Imagem Informativa</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </div>

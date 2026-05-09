@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
+import { FileText, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeProps {
     event: any;
@@ -92,6 +93,33 @@ export default function DarkTheme({ event, locations, guides = [] }: ThemeProps)
                                     <div className="text-white/70 font-light leading-relaxed whitespace-pre-wrap">
                                         {guide.content}
                                     </div>
+
+                                    {guide.file_path && (
+                                        <div className="mt-10">
+                                            <a 
+                                                href={guide.file_path} 
+                                                target="_blank" 
+                                                className="flex items-center justify-between p-4 border border-white/10 rounded-2xl bg-white/5 hover:bg-white/10 transition-all group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-12 h-12 bg-[#0a0a0a] rounded-xl border border-white/5 flex items-center justify-center group-hover:border-white/20">
+                                                        {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                            <FileText className="w-5 h-5 text-red-500" />
+                                                        ) : (
+                                                            <ImageIcon className="w-5 h-5 text-blue-500" />
+                                                        )}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Attachment</p>
+                                                        <p className="text-xs text-white">Ver Documento</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-white/20 group-hover:text-white transition-colors">
+                                                    →
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </div>

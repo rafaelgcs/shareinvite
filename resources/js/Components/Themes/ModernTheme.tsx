@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
+import { FileText, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeProps {
     event: any;
@@ -90,6 +91,28 @@ export default function ModernTheme({ event, locations, guides = [] }: ThemeProp
                                     <div className="text-stone-600 leading-relaxed font-light whitespace-pre-wrap">
                                         {guide.content}
                                     </div>
+
+                                    {guide.file_path && (
+                                        <div className="mt-8">
+                                            <a 
+                                                href={guide.file_path} 
+                                                target="_blank" 
+                                                className="inline-flex items-center gap-4 text-stone-900 group"
+                                            >
+                                                <div className="w-14 h-14 bg-white border border-stone-100 flex items-center justify-center shadow-sm group-hover:bg-stone-900 group-hover:text-white transition-all duration-300">
+                                                    {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                        <FileText className="w-6 h-6" />
+                                                    ) : (
+                                                        <ImageIcon className="w-6 h-6" />
+                                                    )}
+                                                </div>
+                                                <div className="border-b border-stone-200 pb-1 group-hover:border-stone-900 transition-colors">
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-1">Ver Material</p>
+                                                    <p className="text-xs text-stone-400 font-light italic">Attachment</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </div>

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
+import { FileText, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeProps {
     event: any;
@@ -87,6 +88,28 @@ export default function VintageTheme({ event, locations, guides = [] }: ThemePro
                                     <div className="text-lg text-[#6a6c7c] italic leading-relaxed whitespace-pre-wrap">
                                         {guide.content}
                                     </div>
+
+                                    {guide.file_path && (
+                                        <div className="mt-8">
+                                            <a 
+                                                href={guide.file_path} 
+                                                target="_blank" 
+                                                className="inline-flex items-center gap-4 p-4 border border-[#bc6c25]/10 bg-white/50 rounded-sm hover:bg-white transition-all group"
+                                            >
+                                                <div className="w-12 h-12 border border-[#bc6c25]/20 flex items-center justify-center sepia group-hover:bg-[#bc6c25]/10">
+                                                    {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                        <FileText className="w-6 h-6 text-red-800" />
+                                                    ) : (
+                                                        <ImageIcon className="w-6 h-6 text-blue-800" />
+                                                    )}
+                                                </div>
+                                                <div className="text-left">
+                                                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#bc6c25]/60 mb-1">Anexo Informativo</p>
+                                                    <p className="text-sm font-bold text-[#3d405b]">Visualizar Arquivo</p>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </div>

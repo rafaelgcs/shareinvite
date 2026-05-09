@@ -119,15 +119,6 @@ export default function RsvpForm({ eventId, event, allowExtraGuests = true, maxE
                         </div>
                     </div>
 
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/5 transition-all rounded-[2rem] flex items-center justify-center pointer-events-none">
-                            <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg scale-0 group-hover:scale-100 transition-all flex items-center gap-2 text-xs font-bold text-stone-900">
-                                <Download className="w-3 h-3" />
-                                Salvar Imagem
-                            </div>
-                        </div>
-                    </div>
-
                     <p className="text-xs text-stone-400 mt-8">
                         Toque no convite acima para salvar a imagem. <br />
                         Ela será solicitada na entrada do evento.

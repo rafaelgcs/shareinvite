@@ -43,6 +43,7 @@ interface InvitationViewProps {
         title: string;
         content: string;
         type: string;
+        file_path?: string | null;
     }>;
 }
 

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
+import { FileText, Image as ImageIcon } from 'lucide-react';
 
 interface ThemeProps {
     event: any;
@@ -111,6 +112,25 @@ export default function FloralTheme({ event, locations, guides = [] }: ThemeProp
                                     </div>
                                     <h3 className="font-serif text-2xl text-stone-800 mb-4">{guide.title}</h3>
                                     <p className="font-serif italic text-stone-600 leading-relaxed whitespace-pre-wrap">{guide.content}</p>
+
+                                    {guide.file_path && (
+                                        <div className="mt-8 pt-8 border-t border-stone-100 flex justify-center">
+                                            <a 
+                                                href={guide.file_path} 
+                                                target="_blank" 
+                                                className="group flex flex-col items-center gap-2"
+                                            >
+                                                <div className="w-14 h-14 rounded-full bg-white shadow-md border border-stone-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-500">
+                                                    {guide.file_path.toLowerCase().endsWith('.pdf') ? (
+                                                        <FileText className="w-6 h-6 text-red-400" />
+                                                    ) : (
+                                                        <ImageIcon className="w-6 h-6 text-blue-400" />
+                                                    )}
+                                                </div>
+                                                <span className="text-[10px] font-serif italic text-stone-400 uppercase tracking-widest group-hover:text-stone-900 transition-colors">Visualizar Anexo</span>
+                                            </a>
+                                        </div>
+                                    )}
                                 </motion.div>
                             ))}
                         </div>

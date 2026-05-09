@@ -18,7 +18,13 @@ class EventGuideController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'type' => 'required|string|in:dress_code,best_man,bridesmaid,other',
+            'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
         ]);
+
+        if ($request->hasFile('file')) {
+            $path = $request->file('file')->store('guides', 'public');
+            $validated['file_path'] = '/storage/' . $path;
+        }
 
         $event->guides()->create($validated);
 
@@ -31,6 +37,10 @@ class EventGuideController extends Controller
             abort(403);
         }
 
+        if ($guide->file_path) {
+            $path = str_replace('/storage/', '', $guide->file_path);
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($path);
+        }
         $guide->delete();
 
         return back()->with('success', 'Guia removido com sucesso!');
