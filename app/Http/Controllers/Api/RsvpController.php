@@ -1,0 +1,52 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Event;
+use Illuminate\Http\Request;
+
+class RsvpController extends Controller
+{
+    public function store(Request $request, Event $event)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'extra_guests' => 'nullable|integer|min:0|max:10',
+        ]);
+
+        $extraGuests = $validated['extra_guests'] ?? 0;
+        $totalNewGuests = 1 + $extraGuests; // The guest themselves + their extra guests
+
+        // Calculate current total confirmed guests
+        $currentGuestsCount = $event->guests()->count();
+        $currentExtraGuestsCount = (int) $event->guests()->sum('extra_guests');
+        $totalCurrentGuests = $currentGuestsCount + $currentExtraGuestsCount;
+
+        // Check plan limits
+        $plan = $event->plan;
+        
+        if ($plan && $plan->guest_limit > 0) {
+            if (($totalCurrentGuests + $totalNewGuests) > $plan->guest_limit) {
+                return response()->json([
+                    'message' => 'Desculpe, o limite de convidados para este evento foi atingido.',
+                    'limit_exceeded' => true,
+                ], 422);
+            }
+        }
+
+        // Save RSVP
+        $guest = $event->guests()->create([
+            'name' => $validated['name'],
+            'email' => $validated['email'] ?? null,
+            'extra_guests' => $extraGuests,
+            'confirmed_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Presença confirmada com sucesso!',
+            'guest' => $guest,
+        ], 201);
+    }
+}
