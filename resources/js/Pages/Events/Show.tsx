@@ -1,15 +1,17 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { motion } from 'framer-motion';
+import { Head, Link, useForm, router } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Play } from 'lucide-react';
+import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2 } from 'lucide-react';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import DangerButton from '@/Components/DangerButton';
 
 export default function Show({ event }) {
     const [activeTab, setActiveTab] = useState('settings');
 
-    const { data, setData, put, processing, recentlySuccessful } = useForm({
+    const { data: designData, setData: setDesignData, put: putDesign, processing: processingDesign, recentlySuccessful: designSuccess } = useForm({
         primary_color: event.primary_color || '#1c1917',
         secondary_color: event.secondary_color || '#fafaf9',
         animation_type: event.animation_type || 'envelope_3d',
@@ -17,7 +19,44 @@ export default function Show({ event }) {
 
     const submitDesign = (e) => {
         e.preventDefault();
-        put(route('events.updateDesign', event.id));
+        putDesign(route('events.updateDesign', event.id));
+    };
+
+    const { data: locData, setData: setLocData, post: postLoc, processing: locProcessing, reset: resetLoc } = useForm({
+        name: '',
+        address: '',
+        notes: '',
+    });
+
+    const submitLocation = (e) => {
+        e.preventDefault();
+        postLoc(route('events.locations.store', event.id), {
+            onSuccess: () => resetLoc()
+        });
+    };
+
+    const { data: notData, setData: setNotData, post: postNot, processing: notProcessing, reset: resetNot } = useForm({
+        message: '',
+        priority: 'normal',
+    });
+
+    const submitNotice = (e) => {
+        e.preventDefault();
+        postNot(route('events.notices.store', event.id), {
+            onSuccess: () => resetNot()
+        });
+    };
+
+    const deleteLocation = (id) => {
+        if (confirm('Remover local?')) {
+            router.delete(route('events.locations.destroy', [event.id, id]));
+        }
+    };
+
+    const deleteNotice = (id) => {
+        if (confirm('Remover aviso?')) {
+            router.delete(route('events.notices.destroy', [event.id, id]));
+        }
     };
 
     const tabs = [
@@ -26,6 +65,14 @@ export default function Show({ event }) {
         { id: 'notices', label: 'Avisos', icon: Bell },
         { id: 'guests', label: 'Lista de Presença', icon: Users },
     ];
+
+    const animationPreviews = {
+        envelope_3d: 'https://cdn-icons-png.flaticon.com/512/3233/3233076.png', // placeholder for visual
+        gate_fold: 'https://cdn-icons-png.flaticon.com/512/8205/8205322.png',
+        slipcase: 'https://cdn-icons-png.flaticon.com/512/10332/10332309.png',
+        wax_seal: 'https://cdn-icons-png.flaticon.com/512/2857/2857508.png',
+        fade_in: 'https://cdn-icons-png.flaticon.com/512/3286/3286047.png',
+    };
 
     return (
         <AuthenticatedLayout
@@ -50,11 +97,12 @@ export default function Show({ event }) {
                     </div>
                     <div className="flex gap-3">
                         <Link 
-                            href={`/demo/invitation`} 
+                            href={`/${event.slug}`} 
+                            target="_blank"
                             className="flex items-center gap-2 bg-white border border-stone-200 text-stone-700 px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-50 transition-colors shadow-sm"
                         >
                             <ExternalLink className="w-4 h-4" />
-                            Ver Convite
+                            Ver Convite Real
                         </Link>
                     </div>
                 </div>
@@ -102,146 +150,241 @@ export default function Show({ event }) {
                                             <div className="border border-stone-200 p-6 rounded-2xl flex items-center justify-between">
                                                 <div>
                                                     <InputLabel value="Cor Principal" />
-                                                    <p className="text-xs text-stone-400 mt-1">Usada em botões e destaques.</p>
+                                                    <p className="text-xs text-stone-400 mt-1">Usada em botões, destaques e ceras.</p>
                                                 </div>
                                                 <input 
                                                     type="color" 
-                                                    value={data.primary_color}
-                                                    onChange={e => setData('primary_color', e.target.value)}
+                                                    value={designData.primary_color}
+                                                    onChange={e => setDesignData('primary_color', e.target.value)}
                                                     className="w-14 h-14 rounded-full overflow-hidden cursor-pointer border-0 bg-transparent"
                                                 />
                                             </div>
                                             <div className="border border-stone-200 p-6 rounded-2xl flex items-center justify-between">
                                                 <div>
                                                     <InputLabel value="Cor Secundária" />
-                                                    <p className="text-xs text-stone-400 mt-1">Fundo do envelope e áreas amplas.</p>
+                                                    <p className="text-xs text-stone-400 mt-1">Fundo do papel, envelope e áreas amplas.</p>
                                                 </div>
                                                 <input 
                                                     type="color" 
-                                                    value={data.secondary_color}
-                                                    onChange={e => setData('secondary_color', e.target.value)}
+                                                    value={designData.secondary_color}
+                                                    onChange={e => setDesignData('secondary_color', e.target.value)}
                                                     className="w-14 h-14 rounded-full overflow-hidden cursor-pointer border-0 bg-transparent"
                                                 />
                                             </div>
                                         </div>
                                     </div>
 
-                                    {/* Animação */}
+                                    {/* Animação com Preview Integrado */}
                                     <div className="pt-8 border-t border-stone-100">
-                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Estilo de Abertura</h3>
-                                        <p className="text-stone-500 mb-6">Como seus convidados serão recebidos ao abrir o link.</p>
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div>
+                                                <h3 className="font-serif text-2xl text-stone-900 mb-2">Estilo de Abertura (Papelaria Fina)</h3>
+                                                <p className="text-stone-500">Como seus convidados serão recebidos ao abrir o link. Veja o preview na lateral.</p>
+                                            </div>
+                                        </div>
                                         
-                                        <div className="grid md:grid-cols-2 gap-6">
-                                            <div 
-                                                onClick={() => setData('animation_type', 'envelope_3d')}
-                                                className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                                                    data.animation_type === 'envelope_3d' 
-                                                    ? 'border-stone-900 bg-stone-50' 
-                                                    : 'border-stone-200 hover:border-stone-300'
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${data.animation_type === 'envelope_3d' ? 'border-stone-900' : 'border-stone-300'}`}>
-                                                        {data.animation_type === 'envelope_3d' && <div className="w-2.5 h-2.5 bg-stone-900 rounded-full" />}
+                                        <div className="grid md:grid-cols-3 gap-8">
+                                            {/* Coluna de Seleção */}
+                                            <div className="md:col-span-2 space-y-3">
+                                                {[
+                                                    { id: 'envelope_3d', label: 'Envelope Clássico 3D', desc: 'Envelope virtual tradicional com aba superior que se abre.' },
+                                                    { id: 'gate_fold', label: 'Convite em Janela (Portão)', desc: 'Duas abas que se abrem horizontalmente revelando o interior.' },
+                                                    { id: 'slipcase', label: 'Luva Deslizante', desc: 'O convite é puxado elegantemente para cima de dentro de um estojo.' },
+                                                    { id: 'wax_seal', label: 'Quebra de Selo de Cera', desc: 'Foco no selo de cera que se rompe antes da abertura.' },
+                                                    { id: 'fade_in', label: 'Fade Minimalista', desc: 'Transição suave, limpa e direta para a capa do convite.' },
+                                                ].map((anim) => (
+                                                    <div 
+                                                        key={anim.id}
+                                                        onClick={() => setDesignData('animation_type', anim.id)}
+                                                        className={`border-2 rounded-2xl p-4 cursor-pointer transition-all ${
+                                                            designData.animation_type === anim.id 
+                                                            ? 'border-stone-900 bg-stone-50' 
+                                                            : 'border-stone-200 hover:border-stone-300'
+                                                        }`}
+                                                    >
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${designData.animation_type === anim.id ? 'border-stone-900' : 'border-stone-300'}`}>
+                                                                {designData.animation_type === anim.id && <div className="w-2.5 h-2.5 bg-stone-900 rounded-full" />}
+                                                            </div>
+                                                            <div>
+                                                                <span className="font-medium text-stone-900 block">{anim.label}</span>
+                                                                <span className="text-sm text-stone-500">{anim.desc}</span>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                    <span className="font-medium text-stone-900">Envelope 3D Clássico</span>
-                                                </div>
-                                                <p className="text-sm text-stone-500 pl-8">Uma experiência imersiva com um envelope virtual que se abre.</p>
+                                                ))}
                                             </div>
 
-                                            <div 
-                                                onClick={() => setData('animation_type', 'fade_in')}
-                                                className={`border-2 rounded-2xl p-6 cursor-pointer transition-all ${
-                                                    data.animation_type === 'fade_in' 
-                                                    ? 'border-stone-900 bg-stone-50' 
-                                                    : 'border-stone-200 hover:border-stone-300'
-                                                }`}
-                                            >
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${data.animation_type === 'fade_in' ? 'border-stone-900' : 'border-stone-300'}`}>
-                                                        {data.animation_type === 'fade_in' && <div className="w-2.5 h-2.5 bg-stone-900 rounded-full" />}
-                                                    </div>
-                                                    <span className="font-medium text-stone-900">Fade Minimalista</span>
+                                            {/* Preview Simulator */}
+                                            <div className="bg-stone-100 rounded-3xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden h-[400px]">
+                                                <div className="absolute inset-0 bg-gradient-to-br from-stone-200 to-stone-100 opacity-50" />
+                                                <p className="text-stone-400 font-serif text-sm uppercase tracking-widest mb-6 relative z-10">Preview da Abertura</p>
+                                                
+                                                {/* Mini Iframe/Mock to preview the animation - simulating logic */}
+                                                <div 
+                                                    className="w-full max-w-[200px] aspect-[9/16] rounded-xl shadow-2xl relative z-10 flex items-center justify-center"
+                                                    style={{ backgroundColor: designData.secondary_color }}
+                                                >
+                                                    <motion.div 
+                                                        key={designData.animation_type}
+                                                        initial={{ scale: 0.8, opacity: 0 }}
+                                                        animate={{ scale: 1, opacity: 1 }}
+                                                        transition={{ duration: 0.5 }}
+                                                        className="w-16 h-16 rounded-full flex items-center justify-center font-serif text-2xl shadow-lg border"
+                                                        style={{ 
+                                                            backgroundColor: designData.primary_color, 
+                                                            borderColor: designData.primary_color,
+                                                            color: designData.secondary_color 
+                                                        }}
+                                                    >
+                                                        {event.title?.[0] || 'M'}
+                                                    </motion.div>
                                                 </div>
-                                                <p className="text-sm text-stone-500 pl-8">Abertura direta para o convite com uma transição suave e elegante.</p>
+                                                
+                                                <p className="text-stone-500 text-xs mt-6 relative z-10">O convite real possui a física 3D completa.</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Imagens (Placeholder) */}
+                                    <div className="pt-8 border-t border-stone-100">
+                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Imagens do Convite</h3>
+                                        <p className="text-stone-500 mb-6">Configure as imagens que aparecerão no envelope e na capa principal.</p>
+                                        <div className="grid md:grid-cols-2 gap-8">
+                                            <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+                                                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
+                                                    <ImageIcon className="w-8 h-8 text-stone-400" />
+                                                </div>
+                                                <p className="font-medium text-stone-900">Upload Capa Principal</p>
+                                                <p className="text-sm text-stone-500 mt-1">Recomendado: 1080x1920px (Vertical)</p>
+                                            </div>
+                                            <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
+                                                <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-serif font-bold text-2xl text-stone-300">
+                                                    {event.title?.[0] || 'M'}
+                                                </div>
+                                                <p className="font-medium text-stone-900">Upload do Monograma/Selo</p>
+                                                <p className="text-sm text-stone-500 mt-1">Será usado no selo de cera e capa.</p>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="pt-6 border-t border-stone-100 flex items-center gap-4">
-                                        <PrimaryButton disabled={processing}>
-                                            {processing ? 'Salvando...' : 'Salvar Design'}
+                                        <PrimaryButton disabled={processingDesign}>
+                                            {processingDesign ? 'Salvando...' : 'Salvar Design'}
                                         </PrimaryButton>
-                                        {recentlySuccessful && (
+                                        {designSuccess && (
                                             <span className="text-sm text-green-600 font-medium">Salvo com sucesso!</span>
                                         )}
                                     </div>
                                 </form>
-
-                                {/* Imagens (Placeholder) */}
-                                <div className="pt-8 border-t border-stone-100">
-                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Imagens do Convite</h3>
-                                    <p className="text-stone-500 mb-6">Configure as imagens que aparecerão no envelope e na capa principal.</p>
-                                    <div className="grid md:grid-cols-2 gap-8">
-                                        <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
-                                            <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4">
-                                                <ImageIcon className="w-8 h-8 text-stone-400" />
-                                            </div>
-                                            <p className="font-medium text-stone-900">Upload Capa Principal</p>
-                                            <p className="text-sm text-stone-500 mt-1">Recomendado: 1080x1920px (Vertical)</p>
-                                        </div>
-                                        <div className="border-2 border-dashed border-stone-200 rounded-3xl p-8 text-center flex flex-col items-center justify-center bg-stone-50 hover:bg-stone-100 transition-colors cursor-pointer">
-                                            <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 text-serif font-bold text-2xl text-stone-300">
-                                                M&A
-                                            </div>
-                                            <p className="font-medium text-stone-900">Upload do Monograma/Logo</p>
-                                            <p className="text-sm text-stone-500 mt-1">Será usado no selo de cera e capa.</p>
-                                        </div>
-                                    </div>
-                                </div>
                             </motion.div>
                         )}
 
                         {activeTab === 'locations' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <div className="flex justify-between items-center mb-8">
-                                    <div>
-                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Locais do Evento</h3>
-                                        <p className="text-stone-500">Adicione um ou mais locais (ex: Cerimônia e Festa).</p>
-                                    </div>
-                                    <button className="bg-stone-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-stone-800">
-                                        + Novo Local
-                                    </button>
+                                <div className="mb-8">
+                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Locais do Evento</h3>
+                                    <p className="text-stone-500">Adicione os endereços onde seu evento ocorrerá (Cerimônia, Festa, etc).</p>
                                 </div>
+
+                                <div className="bg-stone-50 p-6 rounded-3xl border border-stone-200 mb-8">
+                                    <h4 className="font-medium text-stone-900 mb-4">Novo Endereço</h4>
+                                    <form onSubmit={submitLocation} className="space-y-4">
+                                        <div className="grid md:grid-cols-2 gap-4">
+                                            <div>
+                                                <InputLabel value="Nome do Local (ex: Cerimônia Religiosa)" />
+                                                <TextInput className="mt-1 w-full" value={locData.name} onChange={e => setLocData('name', e.target.value)} required />
+                                            </div>
+                                            <div>
+                                                <InputLabel value="Endereço Completo" />
+                                                <TextInput className="mt-1 w-full" value={locData.address} onChange={e => setLocData('address', e.target.value)} required />
+                                            </div>
+                                            <div className="md:col-span-2">
+                                                <InputLabel value="Anotações / Dicas de Chegada" />
+                                                <TextInput className="mt-1 w-full" value={locData.notes} onChange={e => setLocData('notes', e.target.value)} />
+                                            </div>
+                                        </div>
+                                        <PrimaryButton disabled={locProcessing}>Adicionar Local</PrimaryButton>
+                                    </form>
+                                </div>
+
                                 {event.locations?.length === 0 ? (
                                     <div className="text-center py-12 border border-stone-200 rounded-3xl bg-stone-50">
                                         <MapPin className="w-12 h-12 text-stone-300 mx-auto mb-3" />
                                         <p className="text-stone-500">Nenhum local cadastrado ainda.</p>
                                     </div>
                                 ) : (
-                                    <p>Lista de locais aqui...</p>
+                                    <div className="space-y-4">
+                                        {event.locations?.map((loc) => (
+                                            <div key={loc.id} className="flex justify-between items-center p-5 border border-stone-200 rounded-2xl bg-white hover:border-stone-300 transition-all">
+                                                <div>
+                                                    <h5 className="font-medium text-stone-900">{loc.name}</h5>
+                                                    <p className="text-sm text-stone-500 mt-1">{loc.address}</p>
+                                                    {loc.notes && <p className="text-xs text-stone-400 mt-1 italic">{loc.notes}</p>}
+                                                </div>
+                                                <button onClick={() => deleteLocation(loc.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </motion.div>
                         )}
 
                         {activeTab === 'notices' && (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <div className="flex justify-between items-center mb-8">
-                                    <div>
-                                        <h3 className="font-serif text-2xl text-stone-900 mb-2">Avisos Importantes</h3>
-                                        <p className="text-stone-500">Serão exibidos em um modal elegante logo após a abertura do convite.</p>
-                                    </div>
-                                    <button className="bg-stone-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-stone-800">
-                                        + Adicionar Aviso
-                                    </button>
+                                <div className="mb-8">
+                                    <h3 className="font-serif text-2xl text-stone-900 mb-2">Avisos Importantes</h3>
+                                    <p className="text-stone-500">Alertas que aparecerão logo no início do convite (Ex: Traje Obrigatório).</p>
                                 </div>
+
+                                <div className="bg-stone-50 p-6 rounded-3xl border border-stone-200 mb-8">
+                                    <form onSubmit={submitNotice} className="flex flex-col md:flex-row gap-4 items-end">
+                                        <div className="flex-1 w-full">
+                                            <InputLabel value="Mensagem do Aviso" />
+                                            <TextInput className="mt-1 w-full" value={notData.message} onChange={e => setNotData('message', e.target.value)} required placeholder="Ex: Estacionamento com manobrista gratuito." />
+                                        </div>
+                                        <div className="w-full md:w-48">
+                                            <InputLabel value="Prioridade" />
+                                            <select 
+                                                className="mt-1 block w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none"
+                                                value={notData.priority} 
+                                                onChange={e => setNotData('priority', e.target.value)}
+                                            >
+                                                <option value="low">Baixa</option>
+                                                <option value="normal">Normal</option>
+                                                <option value="high">Alta (Urgente)</option>
+                                            </select>
+                                        </div>
+                                        <PrimaryButton disabled={notProcessing}>Adicionar</PrimaryButton>
+                                    </form>
+                                </div>
+
                                 {event.notices?.length === 0 ? (
                                     <div className="text-center py-12 border border-stone-200 rounded-3xl bg-stone-50">
                                         <Bell className="w-12 h-12 text-stone-300 mx-auto mb-3" />
                                         <p className="text-stone-500">Nenhum aviso configurado.</p>
                                     </div>
                                 ) : (
-                                    <p>Lista de avisos aqui...</p>
+                                    <div className="space-y-4">
+                                        {event.notices?.map((notice) => (
+                                            <div key={notice.id} className="flex justify-between items-center p-5 border border-stone-200 rounded-2xl bg-white">
+                                                <div className="flex items-center gap-4">
+                                                    <span className={`px-2 py-1 rounded text-xs font-medium uppercase tracking-wider ${
+                                                        notice.priority === 'high' ? 'bg-red-100 text-red-800' : 
+                                                        notice.priority === 'normal' ? 'bg-stone-200 text-stone-800' : 'bg-gray-100 text-gray-600'
+                                                    }`}>
+                                                        {notice.priority}
+                                                    </span>
+                                                    <p className="text-stone-900">{notice.message}</p>
+                                                </div>
+                                                <button onClick={() => deleteNotice(notice.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-full transition-colors">
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 )}
                             </motion.div>
                         )}
@@ -269,11 +412,11 @@ export default function Show({ event }) {
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                event.guests?.map((guest: any) => (
+                                                event.guests?.map((guest) => (
                                                     <tr key={guest.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-50">
                                                         <td className="px-6 py-4 font-medium text-stone-900">{guest.name}</td>
                                                         <td className="px-6 py-4">+{guest.extra_guests}</td>
-                                                        <td className="px-6 py-4">{new Date(guest.confirmed_at).toLocaleDateString('pt-BR')}</td>
+                                                        <td className="px-6 py-4">{new Date(guest.created_at).toLocaleDateString('pt-BR')}</td>
                                                     </tr>
                                                 ))
                                             )}

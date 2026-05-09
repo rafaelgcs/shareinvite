@@ -91,7 +91,7 @@ class EventController extends Controller
         $validated = $request->validate([
             'primary_color' => 'required|string|max:20',
             'secondary_color' => 'required|string|max:20',
-            'animation_type' => 'required|string|in:envelope_3d,fade_in',
+            'animation_type' => 'required|string|in:envelope_3d,fade_in,gate_fold,slipcase,wax_seal',
         ]);
 
         $event->update($validated);
