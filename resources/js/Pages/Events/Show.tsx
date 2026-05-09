@@ -2,7 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen } from 'lucide-react';
+import { Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock } from 'lucide-react';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
@@ -131,6 +131,13 @@ export default function Show({ event }) {
                         </h2>
                     </div>
                     <div className="flex gap-3">
+                        <Link 
+                            href={route('events.checkIn', event.id)}
+                            className="flex items-center gap-2 bg-stone-900 text-white px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-stone-800 transition-colors shadow-lg shadow-stone-200"
+                        >
+                            <ShieldCheck className="w-4 h-4" />
+                            Scanner de Entrada
+                        </Link>
                         <Link 
                             href={`/${event.slug}`} 
                             target="_blank"
@@ -790,23 +797,52 @@ export default function Show({ event }) {
                                         <thead className="bg-stone-50 border-b border-stone-200 text-stone-900 uppercase text-xs font-semibold">
                                             <tr>
                                                 <th className="px-6 py-4">Nome do Convidado</th>
-                                                <th className="px-6 py-4">Acompanhantes</th>
+                                                <th className="px-6 py-4 text-center">Acompanhantes</th>
                                                 <th className="px-6 py-4">Data da Confirmação</th>
+                                                <th className="px-6 py-4">Status de Entrada</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             {event.guests?.length === 0 ? (
                                                 <tr>
-                                                    <td colSpan={3} className="px-6 py-12 text-center text-stone-500">
-                                                        Ninguém confirmou presença ainda.
+                                                    <td colSpan={4} className="px-6 py-12 text-center text-stone-500">
+                                                        Nenhuma confirmação recebida até agora.
                                                     </td>
                                                 </tr>
                                             ) : (
                                                 event.guests?.map((guest) => (
-                                                    <tr key={guest.id} className="border-b border-stone-100 last:border-0 hover:bg-stone-50">
-                                                        <td className="px-6 py-4 font-medium text-stone-900">{guest.name}</td>
-                                                        <td className="px-6 py-4">+{guest.extra_guests}</td>
-                                                        <td className="px-6 py-4">{new Date(guest.created_at).toLocaleDateString('pt-BR')}</td>
+                                                    <tr key={guest.id} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <div className="font-medium text-stone-900">{guest.name}</div>
+                                                            <div className="flex flex-col gap-0.5">
+                                                                <div className="text-[10px] text-stone-400">{guest.email || 'E-mail não informado'}</div>
+                                                                {guest.phone && <div className="text-[10px] text-stone-400 flex items-center gap-1">📱 {guest.phone}</div>}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <span className="bg-stone-100 text-stone-600 px-2 py-1 rounded-md text-xs font-bold">
+                                                                +{guest.extra_guests}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-stone-500 text-xs">
+                                                            {new Date(guest.confirmed_at).toLocaleDateString('pt-BR')} às {new Date(guest.confirmed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            {guest.checked_in_at ? (
+                                                                <div className="flex items-center gap-2 text-green-600">
+                                                                    <CheckCircle className="w-4 h-4" />
+                                                                    <span className="text-xs font-bold uppercase tracking-wider">Presente</span>
+                                                                    <span className="text-[10px] text-green-400 font-normal">
+                                                                        ({new Date(guest.checked_in_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })})
+                                                                    </span>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex items-center gap-2 text-stone-300">
+                                                                    <Clock className="w-4 h-4" />
+                                                                    <span className="text-xs font-bold uppercase tracking-wider">Aguardando</span>
+                                                                </div>
+                                                            )}
+                                                        </td>
                                                     </tr>
                                                 ))
                                             )}

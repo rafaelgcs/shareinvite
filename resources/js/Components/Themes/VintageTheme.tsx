@@ -107,7 +107,12 @@ export default function VintageTheme({ event, locations, guides = [] }: ThemePro
                         <h2 className="text-4xl mb-4 italic">Confirme seu Convite</h2>
                         <div className="w-24 h-1 bg-[#bc6c25]/20 mx-auto" />
                     </div>
-                    <RsvpForm eventId={event.id} allowExtraGuests={event.allow_extra_guests} maxExtraGuests={event.max_extra_guests} />
+                    <RsvpForm 
+                        eventId={event.id} 
+                        event={event}
+                        allowExtraGuests={event.allow_extra_guests} 
+                        maxExtraGuests={event.max_extra_guests} 
+                    />
                 </motion.div>
             </section>
         </div>

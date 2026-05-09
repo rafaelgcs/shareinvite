@@ -12,15 +12,28 @@ class Guest extends Model
 
     protected $fillable = [
         'event_id',
+        'uuid',
         'name',
         'email',
+        'phone',
         'extra_guests',
         'confirmed_at',
+        'checked_in_at',
     ];
 
     protected $casts = [
         'confirmed_at' => 'datetime',
+        'checked_in_at' => 'datetime',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($guest) {
+            if (!$guest->uuid) {
+                $guest->uuid = (string) \Illuminate\Support\Str::uuid();
+            }
+        });
+    }
 
     public function event(): BelongsTo
     {

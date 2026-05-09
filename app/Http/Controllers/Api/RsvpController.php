@@ -15,6 +15,7 @@ class RsvpController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
             'extra_guests' => 'nullable|integer|min:0|max:' . $maxExtra,
         ]);
 
@@ -42,6 +43,7 @@ class RsvpController extends Controller
         $guest = $event->guests()->create([
             'name' => $validated['name'],
             'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
             'extra_guests' => $extraGuests,
             'confirmed_at' => now(),
         ]);

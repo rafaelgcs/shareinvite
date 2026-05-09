@@ -109,7 +109,12 @@ export default function ClassicTheme({ event, locations, guides = [] }: ThemePro
                     viewport={{ once: true }}
                     className="relative z-10"
                 >
-                    <RsvpForm eventId={event.id} allowExtraGuests={event.allow_extra_guests} maxExtraGuests={event.max_extra_guests} />
+                    <RsvpForm 
+                        eventId={event.id} 
+                        event={event}
+                        allowExtraGuests={event.allow_extra_guests} 
+                        maxExtraGuests={event.max_extra_guests} 
+                    />
                 </motion.div>
             </section>
         </>

@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
+import html2canvas from 'html2canvas';
+import { Download, Share2 } from 'lucide-react';
 
 interface RsvpFormProps {
     eventId: number;
+    event?: {
+        title: string;
+        event_date: string;
+        logo?: string | null;
+        primary_color?: string;
+    };
     allowExtraGuests?: boolean;
     maxExtraGuests?: number;
 }
 
-export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGuests = 5 }: RsvpFormProps) {
+export default function RsvpForm({ eventId, event, allowExtraGuests = true, maxExtraGuests = 5 }: RsvpFormProps) {
+    const ticketRef = useRef<HTMLDivElement>(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [extraGuests, setExtraGuests] = useState(0);
     const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
+    const [guestData, setGuestData] = useState<any>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,7 +36,7 @@ export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGue
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
-                body: JSON.stringify({ name, email, extra_guests: extraGuests }),
+                body: JSON.stringify({ name, email, phone, extra_guests: extraGuests }),
             });
 
             const data = await response.json();
@@ -32,8 +44,10 @@ export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGue
             if (response.ok) {
                 setStatus('success');
                 setMessage(data.message);
+                setGuestData(data.guest);
                 setName('');
                 setEmail('');
+                setPhone('');
                 setExtraGuests(0);
             } else {
                 setStatus('error');
@@ -45,16 +59,138 @@ export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGue
         }
     };
 
+    const handleDownload = async () => {
+        if (!ticketRef.current) return;
+        
+        try {
+            const canvas = await html2canvas(ticketRef.current, {
+                scale: 3, // Higher quality
+                useCORS: true,
+                backgroundColor: "#ffffff", // Explicitly set background
+                logging: false,
+                width: 320, // Match the ticket width
+                onclone: (clonedDoc) => {
+                    // Ensure the cloned element is visible and properly sized
+                    const ticket = clonedDoc.querySelector('[data-ticket="invitation"]');
+                    if (ticket instanceof HTMLElement) {
+                        ticket.style.transform = 'none';
+                        ticket.style.margin = '0';
+                    }
+                }
+            });
+            
+            const image = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = image;
+            link.download = `convite-${guestData?.name?.toLowerCase().replace(/\s+/g, '-')}.png`;
+            link.click();
+        } catch (error) {
+            console.error("Error generating invitation image:", error);
+        }
+    };
+
     if (status === 'success') {
         return (
-            <div className="bg-green-50 text-green-800 p-8 rounded-3xl text-center border border-green-100">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
+            <div className="flex flex-col items-center">
+                <div className="bg-white p-8 rounded-3xl text-center border border-stone-100 shadow-2xl max-w-md mx-auto mb-8">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h3 className="font-serif text-3xl mb-2 text-stone-900">Presença Confirmada!</h3>
+                    <p className="text-stone-500 mb-8">{message}</p>
+                    
+                    {/* Digital Ticket for Download */}
+                    <div className="relative group cursor-pointer" onClick={handleDownload}>
+                        <div 
+                            ref={ticketRef}
+                            data-ticket="invitation"
+                            className="bg-white rounded-[2rem] overflow-hidden shadow-2xl border border-stone-200 w-[320px] mx-auto text-left relative"
+                        >
+                            {/* Ticket Punch Effect (CSS circles instead of gradients for better compatibility) */}
+                            <div className="absolute left-0 top-[150px] -translate-x-1/2 w-8 h-8 bg-white border border-stone-200 rounded-full z-20 shadow-inner" />
+                            <div className="absolute right-0 top-[150px] translate-x-1/2 w-8 h-8 bg-white border border-stone-200 rounded-full z-20 shadow-inner" />
+
+                            <div className="p-6 bg-stone-900 text-white text-center pb-12">
+                                {event?.logo ? (
+                                    <img src={event.logo} className="w-12 h-12 mx-auto mb-4 object-contain brightness-0 invert" alt="Logo" />
+                                ) : (
+                                    <div className="w-10 h-10 bg-white/10 rounded-full mx-auto mb-4 flex items-center justify-center font-serif text-xl italic">
+                                        {event?.title?.[0] || 'S'}
+                                    </div>
+                                )}
+                                <p className="text-[10px] uppercase tracking-[0.3em] text-white/50 mb-1 font-bold">Convite Individual</p>
+                                <h4 className="font-serif text-xl leading-tight px-6 break-words">
+                                    {event?.title}
+                                </h4>
+                            </div>
+
+                            <div className="px-8 -mt-6 relative z-10">
+                                <div className="bg-white p-4 rounded-2xl shadow-xl border border-stone-100 flex justify-center">
+                                    <QRCodeSVG 
+                                        value={guestData?.uuid || ''} 
+                                        size={180}
+                                        level="H"
+                                        includeMargin={true}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="p-8 pt-6 space-y-6">
+                                <div>
+                                    <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1">Convidado</p>
+                                    <p className="text-lg font-serif text-stone-900 leading-tight break-words">{guestData?.name}</p>
+                                    {guestData?.extra_guests > 0 && (
+                                        <p className="text-[10px] text-stone-500 mt-1 uppercase tracking-wider font-medium">
+                                            + {guestData.extra_guests} acompanhante{guestData.extra_guests > 1 ? 's' : ''}
+                                        </p>
+                                    )}
+                                </div>
+
+                                <div className="pt-6 border-t border-dashed border-stone-200 grid grid-cols-2 gap-4">
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1">Data</p>
+                                        <p className="text-xs font-bold text-stone-800">
+                                            {event?.event_date ? new Date(event.event_date).toLocaleDateString('pt-BR') : '-'}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1">Entrada</p>
+                                        <p className="text-xs font-bold text-stone-800">Código Único</p>
+                                    </div>
+                                </div>
+                                
+                                <div className="pt-4 text-center">
+                                    <p className="text-[8px] text-stone-300 uppercase tracking-widest font-bold">
+                                        SHAREINVITE • LUXURY DIGITAL CARDS
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-stone-900/0 group-hover:bg-stone-900/5 transition-all rounded-[2rem] flex items-center justify-center pointer-events-none">
+                            <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-full shadow-lg scale-0 group-hover:scale-100 transition-all flex items-center gap-2 text-xs font-bold text-stone-900">
+                                <Download className="w-3 h-3" />
+                                Salvar Imagem
+                            </div>
+                        </div>
+                    </div>
+
+                    <p className="text-xs text-stone-400 mt-8">
+                        Toque no convite acima para salvar a imagem. <br />
+                        Ela será solicitada na entrada do evento.
+                    </p>
                 </div>
-                <h3 className="font-serif text-2xl mb-2">Presença Confirmada!</h3>
-                <p className="text-green-700">{message}</p>
+
+                <button
+                    onClick={handleDownload}
+                    className="flex items-center gap-2 px-8 py-4 bg-stone-900 text-white rounded-full font-bold shadow-xl hover:bg-stone-800 transition-all hover:scale-105 active:scale-95"
+                >
+                    <Download className="w-5 h-5" />
+                    Baixar Convite Individual
+                </button>
             </div>
         );
     }
@@ -90,6 +226,17 @@ export default function RsvpForm({ eventId, allowExtraGuests = true, maxExtraGue
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none transition-all"
                         placeholder="Para receber lembretes"
+                    />
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-stone-700 mb-1">WhatsApp (Opcional)</label>
+                    <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-stone-200 focus:ring-2 focus:ring-stone-900 focus:border-stone-900 outline-none transition-all"
+                        placeholder="(00) 00000-0000"
                     />
                 </div>
 

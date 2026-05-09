@@ -26,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('/events/{event}/design', [EventController::class, 'updateDesign'])->name('events.updateDesign');
     
     // Event CRUD
+    Route::get('/events/{event}/check-in', [EventController::class, 'checkIn'])->name('events.checkIn');
     Route::resource('events', EventController::class);
     
     // Event Locations CRUD

@@ -129,4 +129,15 @@ class EventController extends Controller
 
         return back()->with('success', 'Design atualizado com sucesso!');
     }
+
+    public function checkIn(Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return Inertia::render('Events/CheckIn', [
+            'event' => $event,
+        ]);
+    }
 }
