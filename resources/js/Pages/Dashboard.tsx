@@ -2,10 +2,11 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
 import { Plus, Users, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Event } from '@/types';
 
-export default function Dashboard({ events }) {
+export default function Dashboard({ events }: { events: Event[] }) {
     const activeEventsCount = events.filter(e => e.status === 'active').length;
-    const totalGuests = events.reduce((sum, e) => sum + e.guests, 0);
+    const totalGuests = events.reduce((sum, e) => sum + (typeof e.guests === 'number' ? e.guests : 0), 0);
 
     return (
         <AuthenticatedLayout
@@ -104,11 +105,11 @@ export default function Dashboard({ events }) {
                                             <div className="w-full bg-stone-200 rounded-full h-1.5 mb-2 mt-auto">
                                                 <div 
                                                     className="bg-stone-900 h-1.5 rounded-full transition-all" 
-                                                    style={{ width: `${Math.min((evt.guests / evt.limit) * 100, 100)}%` }}
+                                                    style={{ width: `${Math.min(((typeof evt.guests === 'number' ? evt.guests : 0) / evt.limit) * 100, 100)}%` }}
                                                 ></div>
                                             </div>
                                             <p className="text-xs text-stone-500 text-right mb-4">
-                                                {evt.guests} de {evt.limit} convidados
+                                                {typeof evt.guests === 'number' ? evt.guests : 0} de {evt.limit} convidados
                                             </p>
 
                                             {!evt.is_paid && (

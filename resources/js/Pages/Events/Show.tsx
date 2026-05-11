@@ -12,7 +12,10 @@ import TextInput from '@/Components/TextInput';
 import DangerButton from '@/Components/DangerButton';
 import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 
-export default function Show({ event }) {
+import { Event, Guest } from '@/types';
+
+export default function Show({ event }: { event: Event }) {
+    const guestList = Array.isArray(event.guests) ? event.guests : [] as Guest[];
     const [activeTab, setActiveTab] = useState('settings');
     const [previewKey, setPreviewKey] = useState(0);
     const [selectedGuest, setSelectedGuest] = useState<any>(null);
@@ -946,14 +949,14 @@ export default function Show({ event }) {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {event.guests?.length === 0 ? (
+                                            {guestList.length === 0 ? (
                                                 <tr>
                                                     <td colSpan={4} className="px-6 py-12 text-center text-stone-500">
                                                         Nenhuma confirmação recebida até agora.
                                                     </td>
                                                 </tr>
                                             ) : (
-                                                event.guests?.map((guest) => (
+                                                guestList.map((guest) => (
                                                     <tr key={guest.id} className="border-b border-stone-100 hover:bg-stone-50 transition-colors">
                                                         <td className="px-6 py-4">
                                                             <div className="font-medium text-stone-900">{guest.name}</div>

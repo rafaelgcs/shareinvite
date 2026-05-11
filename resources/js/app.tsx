@@ -11,9 +11,9 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => {
         const pages = import.meta.glob('./Pages/**/*.{jsx,tsx}');
-        let path = `./Pages/${name}.jsx`;
+        let path = `./Pages/${name}.tsx`;
         if (!pages[path]) {
-            path = `./Pages/${name}.tsx`;
+            path = `./Pages/${name}.jsx`;
         }
         return resolvePageComponent(path, pages);
     },

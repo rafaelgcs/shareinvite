@@ -5,7 +5,9 @@ import axios from 'axios';
 import { CreditCard, ShieldCheck, Zap, Star, Check, ArrowLeft, Lock } from 'lucide-react';
 import { useState } from 'react';
 
-export default function Checkout({ event }) {
+import { Event } from '@/types';
+
+export default function Checkout({ event }: { event: Event }) {
     const [selectedPlan, setSelectedPlan] = useState('premium');
     const { post, processing } = useForm();
 
