@@ -59,6 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/auth.php';
 
+Route::post('/stripe/webhook', [StripeController::class, 'webhook'])->name('stripe.webhook');
+
 // Public Invitation & Guest Routes
 Route::get('/g/{uuid}', [PublicInvitationController::class, 'guestLogin'])->name('guest.login');
 Route::get('/{slug}', [PublicInvitationController::class, 'show'])->name('invitation.show');

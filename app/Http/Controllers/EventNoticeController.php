@@ -14,6 +14,10 @@ class EventNoticeController extends Controller
             abort(403);
         }
 
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
+        }
+
         $validated = $request->validate([
             'message' => 'required|string|max:500',
             'priority' => 'required|in:low,normal,high',
@@ -28,6 +32,10 @@ class EventNoticeController extends Controller
     {
         if ($event->user_id !== auth()->id() || $notice->event_id !== $event->id) {
             abort(403);
+        }
+
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
         $notice->delete();

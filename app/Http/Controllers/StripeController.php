@@ -91,4 +91,39 @@ class StripeController extends Controller
 
         return redirect()->route('dashboard')->with('error', 'O pagamento não foi concluído.');
     }
+
+    public function webhook(Request $request)
+    {
+        $payload = $request->getContent();
+        $sigHeader = $request->header('Stripe-Signature');
+        $endpointSecret = config('services.stripe.webhook_secret');
+
+        try {
+            $event = \Stripe\Webhook::constructEvent(
+                $payload, $sigHeader, $endpointSecret
+            );
+        } catch (\UnexpectedValueException $e) {
+            return response()->json(['error' => 'Invalid payload'], 400);
+        } catch (\Stripe\Exception\SignatureVerificationException $e) {
+            return response()->json(['error' => 'Invalid signature'], 400);
+        }
+
+        // Handle the event
+        if ($event->type === 'checkout.session.completed') {
+            $session = $event->data->object;
+            $eventId = $session->metadata->event_id ?? null;
+
+            if ($eventId) {
+                $eventModel = Event::find($eventId);
+                if ($eventModel) {
+                    $eventModel->update([
+                        'is_paid' => true,
+                        'status' => 'active'
+                    ]);
+                }
+            }
+        }
+
+        return response()->json(['status' => 'success']);
+    }
 }

@@ -14,6 +14,10 @@ class EventLocationController extends Controller
             abort(403);
         }
 
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',
@@ -31,6 +35,10 @@ class EventLocationController extends Controller
     {
         if ($event->user_id !== auth()->id() || $location->event_id !== $event->id) {
             abort(403);
+        }
+
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
         $location->delete();

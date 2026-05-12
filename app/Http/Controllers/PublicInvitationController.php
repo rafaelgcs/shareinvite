@@ -15,10 +15,11 @@ class PublicInvitationController extends Controller
             ->with(['locations', 'notices'])
             ->firstOrFail();
 
-        if (!$event->is_paid) {
+        if (!$event->hasAccess()) {
             return Inertia::render('Public/UnpaidEvent', [
                 'event' => [
                     'title' => $event->title,
+                    'is_expired' => $event->is_paid && !$event->hasAccess(),
                 ]
             ]);
         }
@@ -71,6 +72,10 @@ class PublicInvitationController extends Controller
     public function feed($slug)
     {
         $event = Event::where('slug', $slug)->firstOrFail();
+
+        if (!$event->hasAccess()) {
+            return redirect()->route('invitation.show', $slug);
+        }
         $posts = $event->posts()
             ->with(['comments', 'likes'])
             ->withCount(['likes', 'comments'])

@@ -14,6 +14,10 @@ class EventGuideController extends Controller
             abort(403);
         }
 
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
+        }
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
@@ -35,6 +39,10 @@ class EventGuideController extends Controller
     {
         if ($event->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
         if ($guide->file_path) {

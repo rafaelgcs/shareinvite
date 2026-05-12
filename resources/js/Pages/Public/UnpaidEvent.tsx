@@ -18,8 +18,9 @@ export default function UnpaidEvent({ event }) {
                 
                 <h1 className="text-3xl font-serif text-white mb-4">{event.title}</h1>
                 <p className="text-stone-400 font-light mb-8 leading-relaxed">
-                    Este convite digital ainda não foi ativado pelo anfitrião. 
-                    Por favor, entre em contato com os organizadores do evento.
+                    {event.is_expired 
+                        ? "O acesso a este convite expirou (limite de 3 meses após o evento). Entre em contato com o anfitrião para renovar o acesso."
+                        : "Este convite digital ainda não foi ativado pelo anfitrião. Por favor, entre em contato com os organizadores do evento."}
                 </p>
                 
                 <div className="space-y-4">
@@ -27,7 +28,9 @@ export default function UnpaidEvent({ event }) {
                         <CreditCard className="w-5 h-5 text-stone-500" />
                         <div>
                             <p className="text-xs font-bold text-white uppercase tracking-wider">Status</p>
-                            <p className="text-sm text-stone-400">Aguardando Pagamento</p>
+                            <p className="text-sm text-stone-400">
+                                {event.is_expired ? "Acesso Expirado" : "Aguardando Pagamento"}
+                            </p>
                         </div>
                     </div>
                 </div>

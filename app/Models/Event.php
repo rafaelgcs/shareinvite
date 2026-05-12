@@ -72,8 +72,19 @@ class Event extends Model
         return $this->hasMany(Post::class);
     }
 
-    public function guides(): HasMany
+    public function canBeEdited(): bool
     {
-        return $this->hasMany(EventGuide::class);
+        // 2 days after the event, it is no longer possible to alter the information.
+        return now()->lte($this->event_date->addDays(2));
+    }
+
+    public function hasAccess(): bool
+    {
+        // Must be paid and within 3 months after the event date
+        if (!$this->is_paid) {
+            return false;
+        }
+
+        return now()->lte($this->event_date->addMonths(3));
     }
 }

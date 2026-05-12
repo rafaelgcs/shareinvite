@@ -26,6 +26,7 @@ class EventController extends Controller
                 'guests' => $event->guests_count,
                 'limit' => $limit,
                 'is_paid' => $event->is_paid,
+                'is_expired' => $event->is_paid && !$event->hasAccess(),
             ];
         });
 
@@ -87,6 +88,10 @@ class EventController extends Controller
     {
         if ($event->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
         $validated = $request->validate([
@@ -200,6 +205,10 @@ class EventController extends Controller
     {
         if ($event->user_id !== auth()->id()) {
             abort(403);
+        }
+
+        if (!$event->canBeEdited()) {
+            return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
         $validated = $request->validate([
