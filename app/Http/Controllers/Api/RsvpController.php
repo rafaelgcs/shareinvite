@@ -48,6 +48,11 @@ class RsvpController extends Controller
             'confirmed_at' => now(),
         ]);
 
+        // Send notification to host
+        if ($event->user) {
+            $event->user->notify(new \App\Notifications\RsvpReceivedNotification($event, $guest));
+        }
+
         // Store guest info in session
         session(['guest_id' => $guest->id, 'guest_name' => $guest->name]);
 

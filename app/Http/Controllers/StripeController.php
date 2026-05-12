@@ -120,6 +120,10 @@ class StripeController extends Controller
                         'is_paid' => true,
                         'status' => 'active'
                     ]);
+
+                    if ($eventModel->user) {
+                        $eventModel->user->notify(new \App\Notifications\PaymentConfirmedNotification($eventModel));
+                    }
                 }
             }
         }

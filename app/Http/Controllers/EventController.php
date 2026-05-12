@@ -57,9 +57,11 @@ class EventController extends Controller
         $event = $request->user()->events()->create([
             'title' => $validated['title'],
             'event_date' => $validated['event_date'],
-            'slug' => Str::slug($validated['slug']),
+            'slug' => \Illuminate\Support\Str::slug($validated['slug']),
             'status' => 'draft',
         ]);
+
+        $request->user()->notify(new \App\Notifications\EventCreatedNotification($event));
 
         return redirect()->route('events.show', $event)->with('success', 'Convite criado! Agora configure os detalhes.');
     }
