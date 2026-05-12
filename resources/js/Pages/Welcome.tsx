@@ -137,7 +137,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                                 <Link href={route('register')} className="px-10 py-5 bg-white text-stone-950 rounded-full text-lg font-bold hover:bg-stone-200 transition-all shadow-2xl flex items-center justify-center gap-2 group">
                                     Começar agora <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                                 </Link>
-                                <a href="/demo/invitation" className="px-10 py-5 bg-stone-900 text-white rounded-full text-lg font-bold hover:bg-stone-800 border border-stone-800 transition-all flex items-center justify-center">
+                                <a href="/g/demo-guest-123" className="px-10 py-5 bg-stone-900 text-white rounded-full text-lg font-bold hover:bg-stone-800 border border-stone-800 transition-all flex items-center justify-center">
                                     Ver Demonstração
                                 </a>
                             </div>

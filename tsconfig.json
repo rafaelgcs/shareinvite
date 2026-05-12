@@ -18,7 +18,7 @@
         "sourceMap": true,
         "esModuleInterop": true,
         "lib": ["esnext", "dom"],
-        "types": ["vite/client"],
+        "types": ["vite/client", "react"],
         "baseUrl": ".",
         "paths": {
             "@/*": ["resources/js/*"],
