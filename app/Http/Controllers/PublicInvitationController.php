@@ -71,7 +71,15 @@ class PublicInvitationController extends Controller
     public function feed($slug)
     {
         $event = Event::where('slug', $slug)->firstOrFail();
-        $posts = $event->posts()->latest()->get();
+        $posts = $event->posts()
+            ->with(['comments', 'likes'])
+            ->withCount(['likes', 'comments'])
+            ->latest()
+            ->get()
+            ->map(function ($post) {
+                $post->is_liked = session('guest_id') ? $post->likes->where('guest_id', session('guest_id'))->isNotEmpty() : false;
+                return $post;
+            });
 
         return Inertia::render('Public/Feed', [
             'event' => $event,

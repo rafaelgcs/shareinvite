@@ -32,4 +32,42 @@ class PostController extends Controller
 
         return back();
     }
+
+    public function toggleLike(Post $post)
+    {
+        if (!session('guest_id')) {
+            return back();
+        }
+
+        $like = $post->likes()->where('guest_id', session('guest_id'))->first();
+
+        if ($like) {
+            $like->delete();
+        } else {
+            $post->likes()->create([
+                'guest_id' => session('guest_id'),
+            ]);
+        }
+
+        return back();
+    }
+
+    public function storeComment(Request $request, Post $post)
+    {
+        if (!session('guest_id')) {
+            return back();
+        }
+
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        $post->comments()->create([
+            'guest_id' => session('guest_id'),
+            'guest_name' => session('guest_name'),
+            'content' => $request->content,
+        ]);
+
+        return back();
+    }
 }

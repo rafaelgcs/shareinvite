@@ -64,4 +64,6 @@ Route::get('/g/{uuid}', [PublicInvitationController::class, 'guestLogin'])->name
 Route::get('/{slug}', [PublicInvitationController::class, 'show'])->name('invitation.show');
 Route::get('/{slug}/feed', [PublicInvitationController::class, 'feed'])->name('invitation.feed');
 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+Route::post('/posts/{post}/like', [PostController::class, 'toggleLike'])->name('posts.like');
+Route::post('/posts/{post}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
 Route::post('/rsvp/{event}', [\App\Http\Controllers\Api\RsvpController::class, 'store'])->name('rsvp.store');
