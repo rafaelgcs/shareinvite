@@ -63,6 +63,15 @@ class StripeController extends Controller
             return redirect()->route('dashboard')->with('error', 'Sessão de pagamento inválida.');
         }
 
+        // Mock payment for development/demo
+        if ($sessionId === 'mock_session') {
+            $event->update([
+                'is_paid' => true,
+                'status' => 'active'
+            ]);
+            return redirect()->route('dashboard')->with('success', 'Pagamento confirmado! Seu convite foi liberado (Modo de Teste).');
+        }
+
         Stripe::setApiKey(config('services.stripe.secret'));
         
         try {

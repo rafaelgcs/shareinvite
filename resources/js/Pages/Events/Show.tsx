@@ -2,11 +2,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, useForm, router } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useRef } from 'react';
-import { 
-    Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon, 
-    Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock, 
-    Share2, Download, X, FileText, Upload, Search, ChevronUp, 
-    ChevronDown, ArrowUpDown, Filter, Sparkles, LayoutDashboard 
+import {
+    Settings, MapPin, Bell, Users, ExternalLink, Image as ImageIcon,
+    Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock,
+    Share2, Download, X, FileText, Upload, Search, ChevronUp,
+    ChevronDown, ArrowUpDown, Filter, Sparkles, LayoutDashboard,
+    Zap
 } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import DigitalTicket from '@/Components/Invitation/DigitalTicket';
@@ -24,8 +25,8 @@ const SortIcon = ({ sortConfig, columnKey }: { sortConfig: any, columnKey: strin
     if (sortConfig.key !== columnKey) {
         return <ArrowUpDown className="w-3.5 h-3.5 text-stone-300 opacity-0 group-hover:opacity-100 transition-all" />;
     }
-    return sortConfig.direction === 'asc' 
-        ? <ChevronUp className="w-3.5 h-3.5 text-[#D4AF37] animate-in fade-in zoom-in duration-300" /> 
+    return sortConfig.direction === 'asc'
+        ? <ChevronUp className="w-3.5 h-3.5 text-[#D4AF37] animate-in fade-in zoom-in duration-300" />
         : <ChevronDown className="w-3.5 h-3.5 text-[#D4AF37] animate-in fade-in zoom-in duration-300" />;
 };
 
@@ -49,12 +50,12 @@ export default function Show({ event }: { event: Event }) {
 
     const filteredAndSortedGuests = guestList
         .filter((guest) => {
-            const matchesSearch = 
+            const matchesSearch =
                 guest.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 (guest.email && guest.email.toLowerCase().includes(searchQuery.toLowerCase())) ||
                 (guest.phone && guest.phone.includes(searchQuery));
-            
-            const matchesStatus = 
+
+            const matchesStatus =
                 statusFilter === 'all' ||
                 (statusFilter === 'present' && guest.checked_in_at) ||
                 (statusFilter === 'waiting' && !guest.checked_in_at);
@@ -197,11 +198,10 @@ export default function Show({ event }: { event: Event }) {
                 <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-8 pb-4">
                     <div className="space-y-4">
                         <div className="flex flex-wrap items-center gap-3">
-                            <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                                event.status === 'active' 
-                                ? 'bg-green-100 text-green-700 border border-green-200' 
-                                : 'bg-stone-200 text-stone-600 border border-stone-300'
-                            }`}>
+                            <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${event.status === 'active'
+                                    ? 'bg-green-100 text-green-700 border border-green-200'
+                                    : 'bg-stone-200 text-stone-600 border border-stone-300'
+                                }`}>
                                 {event.status === 'active' ? 'Evento Ativo' : 'Rascunho'}
                             </span>
                             <div className="flex items-center gap-2 px-3 py-1 bg-white border border-stone-100 rounded-full shadow-sm">
@@ -214,15 +214,24 @@ export default function Show({ event }: { event: Event }) {
                         </h2>
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-                        <Link 
+                        <Link
                             href={route('events.checkIn', event.id)}
                             className="premium-button flex items-center justify-center gap-3 bg-[#0A0A0A] text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-black/10 w-full sm:w-auto"
                         >
                             <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
                             Scanner de Entrada
                         </Link>
-                        <Link 
-                            href={`/${event.slug}`} 
+                        {!event.is_paid && (
+                            <Link
+                                href={route('events.checkout', event.id)}
+                                className="premium-button flex items-center justify-center gap-3 bg-[#D4AF37] text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-[#D4AF37]/30 w-full sm:w-auto hover:bg-[#0A0A0A] transition-all"
+                            >
+                                <Zap className="w-5 h-5 fill-white" />
+                                Ativar Convite
+                            </Link>
+                        )}
+                        <Link
+                            href={`/${event.slug}`}
                             target="_blank"
                             className="premium-button flex items-center justify-center gap-3 bg-white border border-stone-200 text-[#0A0A0A] px-8 py-4 rounded-2xl text-sm font-black shadow-sm hover:border-[#D4AF37] transition-all w-full sm:w-auto"
                         >
@@ -237,7 +246,7 @@ export default function Show({ event }: { event: Event }) {
 
             <div className="py-12 bg-[#F9F8F6] min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    
+
                     {/* Tabs Navigation */}
                     <div className="flex overflow-x-auto no-scrollbar gap-2 mb-10 bg-white p-2.5 rounded-[2rem] shadow-sm border border-stone-100 ambient-shadow">
                         {tabs.map((tab) => {
@@ -247,11 +256,10 @@ export default function Show({ event }: { event: Event }) {
                                 <button
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all duration-300 whitespace-nowrap ${
-                                        isActive 
-                                        ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/10 scale-105 z-10' 
-                                        : 'text-stone-500 hover:text-[#0A0A0A] hover:bg-stone-50'
-                                    }`}
+                                    className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all duration-300 whitespace-nowrap ${isActive
+                                            ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/10 scale-105 z-10'
+                                            : 'text-stone-500 hover:text-[#0A0A0A] hover:bg-stone-50'
+                                        }`}
                                 >
                                     <Icon className={`w-4 h-4 ${isActive ? 'text-[#D4AF37]' : 'text-stone-400'}`} />
                                     {tab.label}
@@ -279,7 +287,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Dados do Evento</h3>
                                                 </div>
                                                 <p className="text-stone-500 mb-10 max-w-2xl">Configure os detalhes fundamentais que identificam sua celebração.</p>
-                                                
+
                                                 <div className="grid md:grid-cols-2 gap-10">
                                                     <div className="space-y-4">
                                                         <InputLabel htmlFor="title" value="Título do Evento" className="uppercase text-[10px] font-black tracking-widest text-stone-400" />
@@ -352,7 +360,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Identidade Visual</h3>
                                                 </div>
                                                 <p className="text-stone-500 mb-10 max-w-2xl">Configure a paleta de cores e o tema que darão vida ao seu convite digital de alta papelaria.</p>
-                                                
+
                                                 {/* Combinações Sugeridas */}
                                                 <div className="mb-12">
                                                     <h4 className="text-[10px] font-black text-stone-400 uppercase tracking-[0.2em] mb-4">Combinações Sugeridas pelo Ateliê</h4>
@@ -369,11 +377,10 @@ export default function Show({ event }: { event: Event }) {
                                                                 key={palette.name}
                                                                 type="button"
                                                                 onClick={() => setDesignData({ ...designData, primary_color: palette.p, secondary_color: palette.s, text_color: palette.t, background_color: palette.b })}
-                                                                className={`group flex items-center gap-3 px-5 py-3 rounded-2xl border-2 transition-all shadow-sm hover:shadow-lg ${
-                                                                    designData.primary_color.toLowerCase() === palette.p.toLowerCase()
-                                                                    ? 'border-[#0A0A0A] bg-stone-50 ring-1 ring-[#0A0A0A]/5'
-                                                                    : 'border-stone-100 bg-white hover:border-stone-200'
-                                                                }`}
+                                                                className={`group flex items-center gap-3 px-5 py-3 rounded-2xl border-2 transition-all shadow-sm hover:shadow-lg ${designData.primary_color.toLowerCase() === palette.p.toLowerCase()
+                                                                        ? 'border-[#0A0A0A] bg-stone-50 ring-1 ring-[#0A0A0A]/5'
+                                                                        : 'border-stone-100 bg-white hover:border-stone-200'
+                                                                    }`}
                                                             >
                                                                 <div className="flex -space-x-2">
                                                                     <div className="w-6 h-6 rounded-full shadow-sm ring-2 ring-white" style={{ backgroundColor: palette.p }} />
@@ -399,16 +406,16 @@ export default function Show({ event }: { event: Event }) {
                                                             </div>
                                                             <div className="flex items-center gap-4">
                                                                 <div className="relative w-12 h-12 rounded-2xl overflow-hidden shadow-inner border border-stone-100 cursor-pointer" style={{ backgroundColor: designData[item.key] }}>
-                                                                    <input 
-                                                                        type="color" 
-                                                                        value={designData[item.key]} 
+                                                                    <input
+                                                                        type="color"
+                                                                        value={designData[item.key]}
                                                                         onChange={e => setDesignData(item.key, e.target.value)}
                                                                         className="absolute inset-0 w-full h-full cursor-pointer opacity-0"
                                                                     />
                                                                 </div>
-                                                                <input 
-                                                                    type="text" 
-                                                                    value={designData[item.key]} 
+                                                                <input
+                                                                    type="text"
+                                                                    value={designData[item.key]}
                                                                     onChange={e => setDesignData(item.key, e.target.value)}
                                                                     className="w-full font-mono text-[10px] font-black uppercase bg-stone-50 border-stone-100 rounded-xl px-3 py-2 focus:ring-0 focus:border-[#D4AF37]"
                                                                 />
@@ -424,7 +431,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <ImageIcon className="w-6 h-6 text-[#D4AF37]" />
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Imagens e Identidade</h3>
                                                 </div>
-                                                
+
                                                 <div className="grid md:grid-cols-2 gap-8">
                                                     <div className="space-y-4">
                                                         <p className="text-xs font-black text-[#0A0A0A] uppercase tracking-widest">Logo do Evento</p>
@@ -436,8 +443,8 @@ export default function Show({ event }: { event: Event }) {
                                                             ) : (
                                                                 <Upload className="w-8 h-8 text-stone-300 mb-2" />
                                                             )}
-                                                            <input 
-                                                                type="file" 
+                                                            <input
+                                                                type="file"
                                                                 onChange={e => setDesignData('logo', e.target.files[0])}
                                                                 className="absolute inset-0 opacity-0 cursor-pointer"
                                                             />
@@ -455,8 +462,8 @@ export default function Show({ event }: { event: Event }) {
                                                             ) : (
                                                                 <Upload className="w-8 h-8 text-stone-300 mb-2" />
                                                             )}
-                                                            <input 
-                                                                type="file" 
+                                                            <input
+                                                                type="file"
                                                                 onChange={e => setDesignData('cover_image', e.target.files[0])}
                                                                 className="absolute inset-0 opacity-0 cursor-pointer z-20"
                                                             />
@@ -472,7 +479,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <Sparkles className="w-6 h-6 text-[#D4AF37]" />
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Estilo Visual</h3>
                                                 </div>
-                                                
+
                                                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                                                     {[
                                                         { id: 'classic', label: 'Clássico', desc: 'Elegância atemporal' },
@@ -481,14 +488,13 @@ export default function Show({ event }: { event: Event }) {
                                                         { id: 'dark', label: 'Noir', desc: 'Noturno' },
                                                         { id: 'vintage', label: 'Vintage', desc: 'Papelaria Antiga' },
                                                     ].map((theme) => (
-                                                        <div 
+                                                        <div
                                                             key={theme.id}
                                                             onClick={() => setDesignData('theme', theme.id)}
-                                                            className={`p-6 rounded-[2rem] border-2 cursor-pointer transition-all text-center group ${
-                                                                designData.theme === theme.id 
-                                                                ? 'border-[#0A0A0A] bg-stone-50' 
-                                                                : 'border-stone-100 hover:border-stone-200 bg-white'
-                                                            }`}
+                                                            className={`p-6 rounded-[2rem] border-2 cursor-pointer transition-all text-center group ${designData.theme === theme.id
+                                                                    ? 'border-[#0A0A0A] bg-stone-50'
+                                                                    : 'border-stone-100 hover:border-stone-200 bg-white'
+                                                                }`}
                                                         >
                                                             <div className={`w-8 h-8 rounded-full mx-auto mb-3 border-4 flex items-center justify-center ${designData.theme === theme.id ? 'border-[#D4AF37] bg-[#0A0A0A]' : 'border-stone-100 bg-stone-50'}`}>
                                                                 {designData.theme === theme.id && <CheckCircle className="w-3 h-3 text-white" />}
@@ -506,7 +512,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <ExternalLink className="w-6 h-6 text-[#D4AF37]" />
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Experiência de Abertura</h3>
                                                 </div>
-                                                
+
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                                     {[
                                                         { id: 'envelope_3d', label: 'Envelope 3D Premium', desc: 'Abertura física realista' },
@@ -515,28 +521,27 @@ export default function Show({ event }: { event: Event }) {
                                                         { id: 'wax_seal', label: 'Selo de Cera (Wax Seal)', desc: 'Foco no selo de marca' },
                                                         { id: 'fade_in', label: 'Minimalista (Fade)', desc: 'Surgimento suave e etéreo' },
                                                     ].map((anim) => (
-                                                        <div 
+                                                        <div
                                                             key={anim.id}
-                                                            className={`group p-6 rounded-[2rem] border-2 transition-all flex flex-col gap-4 ${
-                                                                designData.animation_type === anim.id 
-                                                                ? 'border-[#0A0A0A] bg-stone-50' 
-                                                                : 'border-stone-100 hover:border-stone-200 bg-white'
-                                                            }`}
+                                                            className={`group p-6 rounded-[2rem] border-2 transition-all flex flex-col gap-4 ${designData.animation_type === anim.id
+                                                                    ? 'border-[#0A0A0A] bg-stone-50'
+                                                                    : 'border-stone-100 hover:border-stone-200 bg-white'
+                                                                }`}
                                                         >
                                                             <div className="flex items-center justify-between">
-                                                                <div 
+                                                                <div
                                                                     onClick={() => setDesignData('animation_type', anim.id)}
                                                                     className="cursor-pointer flex-1"
                                                                 >
                                                                     <p className="font-black text-xs uppercase tracking-widest text-[#0A0A0A] mb-1">{anim.label}</p>
                                                                     <p className="text-[10px] text-stone-400 font-medium">{anim.desc}</p>
                                                                 </div>
-                                                                <div 
+                                                                <div
                                                                     onClick={() => setDesignData('animation_type', anim.id)}
-                                                                    className={`w-6 h-6 rounded-full border-4 cursor-pointer ${designData.animation_type === anim.id ? 'border-[#D4AF37]' : 'border-stone-100'}`} 
+                                                                    className={`w-6 h-6 rounded-full border-4 cursor-pointer ${designData.animation_type === anim.id ? 'border-[#D4AF37]' : 'border-stone-100'}`}
                                                                 />
                                                             </div>
-                                                            <button 
+                                                            <button
                                                                 type="button"
                                                                 onClick={() => {
                                                                     setSelectedGuest({ type: 'anim_preview', animId: anim.id });
@@ -562,9 +567,9 @@ export default function Show({ event }: { event: Event }) {
                                                             <p className="text-stone-400 font-medium">Controle as confirmações de presença com precisão.</p>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer group">
-                                                            <input 
-                                                                type="checkbox" 
-                                                                className="sr-only peer" 
+                                                            <input
+                                                                type="checkbox"
+                                                                className="sr-only peer"
                                                                 checked={designData.rsvp_enabled}
                                                                 onChange={e => setDesignData('rsvp_enabled', e.target.checked)}
                                                             />
@@ -579,7 +584,7 @@ export default function Show({ event }: { event: Event }) {
                                                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-12 pt-12 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-12">
                                                             <div className="space-y-4">
                                                                 <InputLabel value="Data Limite para Confirmação" className="text-white opacity-60 uppercase tracking-widest text-[10px] font-black" />
-                                                                <input 
+                                                                <input
                                                                     type="date"
                                                                     className="w-full bg-white/5 border-white/10 rounded-2xl px-6 py-4 text-white font-bold focus:ring-[#D4AF37] focus:border-[#D4AF37] outline-none transition-all"
                                                                     value={designData.rsvp_deadline}
@@ -599,9 +604,9 @@ export default function Show({ event }: { event: Event }) {
                                                                         <p className="text-sm font-black uppercase tracking-widest mb-4">Limite Máximo</p>
                                                                         <div className="flex gap-2 flex-wrap">
                                                                             {[1, 2, 3, 4, 5, 10].map(n => (
-                                                                                <button 
-                                                                                    key={n} 
-                                                                                    type="button" 
+                                                                                <button
+                                                                                    key={n}
+                                                                                    type="button"
                                                                                     onClick={() => setDesignData('max_extra_guests', n)}
                                                                                     className={`px-4 py-2 rounded-xl text-xs font-black border transition-all ${designData.max_extra_guests === n ? 'bg-[#D4AF37] border-[#D4AF37] text-[#0A0A0A]' : 'bg-white/5 border-white/10 text-white hover:border-white/30'}`}
                                                                                 >
@@ -641,7 +646,7 @@ export default function Show({ event }: { event: Event }) {
                                                 <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight mb-2">Lista de Presença</h3>
                                                 <p className="text-stone-500 font-medium italic">Acompanhe quem já faz parte deste momento especial.</p>
                                             </div>
-                                            <a 
+                                            <a
                                                 href={route('events.guests.export', event.id)}
                                                 className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
                                             >
@@ -660,11 +665,10 @@ export default function Show({ event }: { event: Event }) {
                                                     <button
                                                         key={filter.id}
                                                         onClick={() => setStatusFilter(filter.id)}
-                                                        className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                                                            statusFilter === filter.id
-                                                            ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/20'
-                                                            : 'text-stone-400 hover:text-[#0A0A0A] hover:bg-stone-50'
-                                                        }`}
+                                                        className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === filter.id
+                                                                ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/20'
+                                                                : 'text-stone-400 hover:text-[#0A0A0A] hover:bg-stone-50'
+                                                            }`}
                                                     >
                                                         {filter.label}
                                                         <span className={`px-2 py-0.5 rounded-full ${statusFilter === filter.id ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-400'}`}>
@@ -729,7 +733,7 @@ export default function Show({ event }: { event: Event }) {
                                                                     </div>
                                                                     <div className="text-stone-400 font-bold uppercase tracking-widest text-xs">Nenhum registro encontrado</div>
                                                                     {searchQuery && (
-                                                                        <button onClick={() => {setSearchQuery(''); setStatusFilter('all');}} className="text-[#0A0A0A] font-black underline underline-offset-8 hover:text-[#D4AF37] transition-colors text-sm">Limpar Filtros</button>
+                                                                        <button onClick={() => { setSearchQuery(''); setStatusFilter('all'); }} className="text-[#0A0A0A] font-black underline underline-offset-8 hover:text-[#D4AF37] transition-colors text-sm">Limpar Filtros</button>
                                                                     )}
                                                                 </div>
                                                             </td>
@@ -798,7 +802,7 @@ export default function Show({ event }: { event: Event }) {
                                         </div>
                                     </div>
                                 )}
-                                
+
                                 {activeTab === 'locations' && (
                                     <div className="space-y-12">
                                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
@@ -813,25 +817,25 @@ export default function Show({ event }: { event: Event }) {
                                                 <form onSubmit={submitLocation} className="bg-stone-50 p-8 rounded-[2.5rem] border border-stone-100 space-y-6">
                                                     <div className="space-y-4">
                                                         <InputLabel value="Nome do Local (Ex: Catedral)" className="uppercase text-[10px] font-black tracking-widest text-stone-400" />
-                                                        <TextInput 
-                                                            className="w-full" 
-                                                            value={locData.name} 
-                                                            onChange={e => setLocData('name', e.target.value)} 
+                                                        <TextInput
+                                                            className="w-full"
+                                                            value={locData.name}
+                                                            onChange={e => setLocData('name', e.target.value)}
                                                             placeholder="Ex: Espaço das Palmeiras"
                                                         />
                                                     </div>
                                                     <div className="space-y-4">
                                                         <InputLabel value="Endereço Completo" className="uppercase text-[10px] font-black tracking-widest text-stone-400" />
-                                                        <TextInput 
-                                                            className="w-full" 
-                                                            value={locData.address} 
-                                                            onChange={e => setLocData('address', e.target.value)} 
+                                                        <TextInput
+                                                            className="w-full"
+                                                            value={locData.address}
+                                                            onChange={e => setLocData('address', e.target.value)}
                                                             placeholder="Rua, Número, Bairro, Cidade"
                                                         />
                                                     </div>
                                                     <div className="space-y-4">
                                                         <InputLabel value="Observações (Opcional)" className="uppercase text-[10px] font-black tracking-widest text-stone-400" />
-                                                        <textarea 
+                                                        <textarea
                                                             className="w-full border-stone-200 focus:border-[#D4AF37] focus:ring-[#D4AF37] rounded-2xl p-4 text-sm"
                                                             value={locData.notes}
                                                             onChange={e => setLocData('notes', e.target.value)}
@@ -853,11 +857,11 @@ export default function Show({ event }: { event: Event }) {
                                                     </div>
                                                 ) : (
                                                     event.locations.map((loc) => (
-                                                        <motion.div 
+                                                        <motion.div
                                                             layout
                                                             initial={{ opacity: 0, y: 10 }}
                                                             animate={{ opacity: 1, y: 0 }}
-                                                            key={loc.id} 
+                                                            key={loc.id}
                                                             className="flex items-center justify-between p-8 bg-white border border-stone-100 rounded-[2.5rem] shadow-sm hover:shadow-md transition-all group"
                                                         >
                                                             <div className="flex items-center gap-6">
@@ -893,7 +897,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37] opacity-10 rounded-full blur-3xl" />
                                                     <div className="space-y-4 relative z-10">
                                                         <InputLabel value="Sua Mensagem" className="text-white opacity-60 uppercase text-[10px] font-black tracking-widest" />
-                                                        <textarea 
+                                                        <textarea
                                                             className="w-full bg-white/5 border-white/10 focus:border-[#D4AF37] focus:ring-0 rounded-2xl p-5 text-sm text-white placeholder-white/20"
                                                             value={notData.message}
                                                             onChange={e => setNotData('message', e.target.value)}
@@ -903,7 +907,7 @@ export default function Show({ event }: { event: Event }) {
                                                     </div>
                                                     <div className="space-y-4 relative z-10">
                                                         <InputLabel value="Prioridade" className="text-white opacity-60 uppercase text-[10px] font-black tracking-widest" />
-                                                        <select 
+                                                        <select
                                                             className="w-full bg-white/5 border-white/10 focus:border-[#D4AF37] focus:ring-0 rounded-2xl p-4 text-sm text-white"
                                                             value={notData.priority}
                                                             onChange={e => setNotData('priority', e.target.value)}
@@ -927,23 +931,21 @@ export default function Show({ event }: { event: Event }) {
                                                     </div>
                                                 ) : (
                                                     event.notices.map((notice) => (
-                                                        <motion.div 
+                                                        <motion.div
                                                             layout
                                                             initial={{ opacity: 0, scale: 0.95 }}
                                                             animate={{ opacity: 1, scale: 1 }}
-                                                            key={notice.id} 
-                                                            className={`p-8 rounded-[2.5rem] border flex items-start justify-between relative overflow-hidden ${
-                                                                notice.priority === 'urgent' 
-                                                                ? 'bg-[#0A0A0A] border-stone-800 text-white shadow-2xl' 
-                                                                : notice.priority === 'important'
-                                                                ? 'bg-[#FCFBF8] border-[#D4AF37]/30 text-[#0A0A0A] shadow-lg shadow-[#D4AF37]/5'
-                                                                : 'bg-white border-stone-100 text-stone-600'
-                                                            }`}
+                                                            key={notice.id}
+                                                            className={`p-8 rounded-[2.5rem] border flex items-start justify-between relative overflow-hidden ${notice.priority === 'urgent'
+                                                                    ? 'bg-[#0A0A0A] border-stone-800 text-white shadow-2xl'
+                                                                    : notice.priority === 'important'
+                                                                        ? 'bg-[#FCFBF8] border-[#D4AF37]/30 text-[#0A0A0A] shadow-lg shadow-[#D4AF37]/5'
+                                                                        : 'bg-white border-stone-100 text-stone-600'
+                                                                }`}
                                                         >
                                                             <div className="flex gap-6 items-start">
-                                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${
-                                                                    notice.priority === 'urgent' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-stone-50'
-                                                                }`}>
+                                                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 ${notice.priority === 'urgent' ? 'bg-[#D4AF37]/20 text-[#D4AF37]' : 'bg-stone-50'
+                                                                    }`}>
                                                                     <Bell className="w-5 h-5" />
                                                                 </div>
                                                                 <div>
@@ -1009,11 +1011,11 @@ export default function Show({ event }: { event: Event }) {
                                                     </div>
                                                 ) : (
                                                     event.guides.map((guide) => (
-                                                        <motion.div 
+                                                        <motion.div
                                                             layout
                                                             initial={{ opacity: 0, y: 10 }}
                                                             animate={{ opacity: 1, y: 0 }}
-                                                            key={guide.id} 
+                                                            key={guide.id}
                                                             className="bg-white border border-stone-100 p-8 rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all group relative overflow-hidden"
                                                         >
                                                             <div className="absolute top-0 right-0 p-4">
@@ -1029,11 +1031,11 @@ export default function Show({ event }: { event: Event }) {
                                                             </div>
                                                             <h4 className="text-2xl font-black text-[#0A0A0A] mb-3 leading-tight">{guide.title}</h4>
                                                             <p className="text-sm text-stone-500 line-clamp-3 mb-6 font-medium leading-relaxed">{guide.content}</p>
-                                                            
+
                                                             {guide.file_path && (
-                                                                <a 
-                                                                    href={`/storage/${guide.file_path}`} 
-                                                                    target="_blank" 
+                                                                <a
+                                                                    href={`/storage/${guide.file_path}`}
+                                                                    target="_blank"
                                                                     className="inline-flex items-center gap-2 text-xs font-black text-[#0A0A0A] uppercase tracking-widest hover:text-[#D4AF37] transition-colors"
                                                                 >
                                                                     <FileText className="w-4 h-4" />
@@ -1057,13 +1059,13 @@ export default function Show({ event }: { event: Event }) {
             {/* Animation Preview Modal */}
             <Modal show={isSharingModalOpen && selectedGuest?.type === 'anim_preview'} onClose={() => setIsSharingModalOpen(false)} maxWidth="2xl">
                 <div className="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-stone-100 h-[600px] relative">
-                    <button 
+                    <button
                         onClick={() => setIsSharingModalOpen(false)}
                         className="absolute top-8 right-8 z-[60] w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-[#0A0A0A] hover:bg-white transition-all shadow-xl"
                     >
                         <X className="w-6 h-6" />
                     </button>
-                    
+
                     <EnvelopeAnimation
                         isPreview={true}
                         animationType={selectedGuest?.animId}
@@ -1078,7 +1080,7 @@ export default function Show({ event }: { event: Event }) {
                             <Sparkles className="w-12 h-12 text-[#D4AF37] mb-6" />
                             <h3 className="font-serif text-3xl font-black mb-4">Seu Convite Aparecerá Aqui</h3>
                             <p className="text-stone-500 max-w-sm mx-auto">Esta é uma demonstração de como seus convidados experimentarão a abertura do seu evento.</p>
-                            <button 
+                            <button
                                 onClick={() => setIsSharingModalOpen(false)}
                                 className="mt-8 px-8 py-4 bg-[#0A0A0A] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-black/20"
                             >
