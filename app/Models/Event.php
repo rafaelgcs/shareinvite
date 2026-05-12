@@ -72,6 +72,11 @@ class Event extends Model
         return $this->hasMany(Post::class);
     }
 
+    public function guides(): HasMany
+    {
+        return $this->hasMany(EventGuide::class);
+    }
+
     public function canBeEdited(): bool
     {
         // 2 days after the event, it is no longer possible to alter the information.

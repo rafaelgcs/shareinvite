@@ -49,7 +49,7 @@ export default function Checkout({ event }: { event: Event }) {
             console.error('Erro ao iniciar checkout:', error);
             // Fallback for dev environment without Stripe keys
             if (confirm('Ambiente de teste detectado. Deseja ativar este convite gratuitamente para teste?')) {
-                window.location.href = route('stripe.success', { event: event.id, session_id: 'mock_session' });
+                window.location.href = route('stripe.success', { event: event.id, sid: 'mock_session' });
             }
         }
     };

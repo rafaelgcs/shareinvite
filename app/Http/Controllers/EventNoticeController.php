@@ -20,7 +20,7 @@ class EventNoticeController extends Controller
 
         $validated = $request->validate([
             'message' => 'required|string|max:500',
-            'priority' => 'required|in:low,normal,high',
+            'priority' => 'required|in:low,normal,high,important,urgent',
         ]);
 
         $event->notices()->create($validated);

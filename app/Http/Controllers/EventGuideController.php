@@ -21,7 +21,7 @@ class EventGuideController extends Controller
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'type' => 'required|string|in:dress_code,best_man,bridesmaid,other',
+            'type' => 'required|string|in:hotel,gifts,style,dress_code,best_man,bridesmaid,other',
             'file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240', // 10MB max
         ]);
 
