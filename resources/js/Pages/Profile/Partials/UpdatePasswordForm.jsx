@@ -5,6 +5,7 @@ import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import { useRef } from 'react';
+import { ShieldCheck, CheckCircle } from 'lucide-react';
 
 export default function UpdatePasswordForm({ className = '' }) {
     const passwordInput = useRef();
@@ -46,22 +47,27 @@ export default function UpdatePasswordForm({ className = '' }) {
 
     return (
         <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                    Update Password
-                </h2>
+            <header className="mb-10">
+                <div className="flex items-center gap-4 mb-3">
+                    <div className="w-12 h-12 bg-[#0A0A0A] rounded-2xl flex items-center justify-center text-[#D4AF37] shadow-xl shadow-black/10">
+                        <ShieldCheck className="w-6 h-6" />
+                    </div>
+                    <h2 className="font-serif text-3xl font-black text-[#0A0A0A] tracking-tight">
+                        Alterar Senha
+                    </h2>
+                </div>
 
-                <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Ensure your account is using a long, random password to stay
-                    secure.
+                <p className="text-stone-500 font-medium">
+                    Certifique-se de que sua conta esteja usando uma senha longa e aleatória para se manter segura.
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-6 space-y-6">
-                <div>
+            <form onSubmit={updatePassword} className="space-y-8 max-w-xl">
+                <div className="space-y-3">
                     <InputLabel
                         htmlFor="current_password"
-                        value="Current Password"
+                        value="Senha Atual"
+                        className="uppercase text-[10px] font-black tracking-widest text-stone-400"
                     />
 
                     <TextInput
@@ -72,7 +78,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('current_password', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="w-full"
                         autoComplete="current-password"
                     />
 
@@ -82,8 +88,8 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                 </div>
 
-                <div>
-                    <InputLabel htmlFor="password" value="New Password" />
+                <div className="space-y-3">
+                    <InputLabel htmlFor="password" value="Nova Senha" className="uppercase text-[10px] font-black tracking-widest text-stone-400" />
 
                     <TextInput
                         id="password"
@@ -91,17 +97,18 @@ export default function UpdatePasswordForm({ className = '' }) {
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         type="password"
-                        className="mt-1 block w-full"
+                        className="w-full"
                         autoComplete="new-password"
                     />
 
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
-                <div>
+                <div className="space-y-3">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Confirmar Nova Senha"
+                        className="uppercase text-[10px] font-black tracking-widest text-stone-400"
                     />
 
                     <TextInput
@@ -111,7 +118,7 @@ export default function UpdatePasswordForm({ className = '' }) {
                             setData('password_confirmation', e.target.value)
                         }
                         type="password"
-                        className="mt-1 block w-full"
+                        className="w-full"
                         autoComplete="new-password"
                     />
 
@@ -121,8 +128,10 @@ export default function UpdatePasswordForm({ className = '' }) {
                     />
                 </div>
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                <div className="flex items-center gap-6 pt-4">
+                    <PrimaryButton disabled={processing} className="premium-button bg-[#0A0A0A] text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest">
+                        {processing ? 'Alterando...' : 'Atualizar Senha'}
+                    </PrimaryButton>
 
                     <Transition
                         show={recentlySuccessful}
@@ -131,8 +140,9 @@ export default function UpdatePasswordForm({ className = '' }) {
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                            Saved.
+                        <p className="text-xs font-black text-green-600 uppercase tracking-widest flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4" />
+                            Senha alterada com sucesso.
                         </p>
                     </Transition>
                 </div>

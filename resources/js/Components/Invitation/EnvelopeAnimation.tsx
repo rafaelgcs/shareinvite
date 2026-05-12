@@ -66,7 +66,7 @@ export default function EnvelopeAnimation({
         }
         return (
             <div 
-                className="w-20 h-20 rounded-full flex items-center justify-center font-serif text-4xl shadow-inner border"
+                className="w-20 h-20 rounded-[1.5rem] flex items-center justify-center font-serif text-4xl shadow-inner border"
                 style={{ 
                     backgroundColor: primaryColor, 
                     borderColor: primaryColor,
@@ -289,7 +289,7 @@ export default function EnvelopeAnimation({
                             <img src={logo} alt="Logo" className="w-48 h-48 mx-auto mb-8 object-contain drop-shadow-2xl" />
                         ) : (
                             <div 
-                                className="w-32 h-32 backdrop-blur-md rounded-full border mx-auto flex items-center justify-center mb-8 shadow-2xl"
+                                className="w-32 h-32 backdrop-blur-md rounded-[2.5rem] border mx-auto flex items-center justify-center mb-8 shadow-2xl"
                                 style={{ backgroundColor: `${secondaryColor}20`, borderColor: `${secondaryColor}40` }}
                             >
                                 <span className="font-serif text-5xl" style={{ color: secondaryColor }}>{title?.[0] || 'E'}</span>

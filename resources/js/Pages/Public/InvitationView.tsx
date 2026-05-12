@@ -104,7 +104,7 @@ export default function InvitationView({ event, locations, notices, guides }: In
                     
                     <div className="max-w-4xl mx-auto px-4">
                         <div className="mb-12">
-                            <span className="font-serif text-3xl text-white/90 tracking-tighter">ShareInvite</span>
+                            <span className="font-serif text-3xl text-white/90 tracking-tighter">Miu Invites</span>
                             <div className="h-px w-8 bg-white/20 mx-auto mt-4" />
                         </div>
                         

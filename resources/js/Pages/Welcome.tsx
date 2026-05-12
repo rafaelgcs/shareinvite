@@ -73,16 +73,16 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
 
     return (
         <div ref={containerRef} className="bg-stone-950 text-stone-100 font-sans selection:bg-stone-700 selection:text-white min-h-screen overflow-x-hidden">
-            <Head title="ShareInvite - A Nova Era dos Convites Digitais Premium" />
+            <Head title="Miu Invites - A Nova Era dos Convites Digitais Premium" />
 
             {/* Navigation */}
             <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
                 <div className="max-w-7xl mx-auto flex justify-between items-center bg-stone-900/50 backdrop-blur-xl border border-white/10 rounded-full px-6 py-3 shadow-2xl">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-inner">
-                            <span className="font-serif text-lg font-bold text-stone-950 italic">S</span>
+                        <div className="w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center shadow-inner">
+                            <span className="font-serif text-lg font-bold text-[#0A0A0A] italic">M</span>
                         </div>
-                        <span className="font-serif text-xl tracking-tight text-white">ShareInvite</span>
+                        <span className="font-serif text-xl tracking-tight text-white">Miu<span className="text-[#D4AF37]">Invites</span></span>
                     </div>
 
                     <div className="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -201,7 +201,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                     <div className="text-center mb-24">
                         <h2 className="text-4xl md:text-6xl font-serif text-white mb-6">Tudo o que você precisa.</h2>
                         <p className="text-stone-400 text-lg font-light max-w-2xl mx-auto">
-                            Desde o primeiro convite até o check-in na entrada, o ShareInvite cuida de cada detalhe com elegância e precisão.
+                            Desde o primeiro convite até o check-in na entrada, o Miu Invites cuida de cada detalhe com elegância e precisão.
                         </p>
                     </div>
 
@@ -347,7 +347,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                     <div className="relative z-10">
                         <h2 className="text-4xl md:text-7xl font-serif text-white mb-8">Pronto para criar algo inesquecível?</h2>
                         <p className="text-xl text-stone-400 font-light mb-12 max-w-2xl mx-auto leading-relaxed">
-                            Junte-se a milhares de anfitriões que transformaram seus eventos com o ShareInvite.
+                            Junte-se a milhares de anfitriões que transformaram seus eventos com o Miu Invites.
                         </p>
                         <Link href={route('register')} className="inline-flex items-center gap-3 px-12 py-6 bg-white text-stone-950 rounded-full text-xl font-bold hover:bg-stone-200 transition-all shadow-2xl transform hover:scale-105">
                             Começar agora gratuitamente <ArrowRight className="w-6 h-6" />
@@ -361,10 +361,10 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                 <div className="max-w-7xl mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12">
                         <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center">
-                                <span className="font-serif text-lg font-bold text-white italic">S</span>
+                            <div className="w-8 h-8 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                                <span className="font-serif text-lg font-bold text-[#0A0A0A] italic">M</span>
                             </div>
-                            <span className="font-serif text-xl tracking-tight text-white">ShareInvite</span>
+                            <span className="font-serif text-xl tracking-tight text-white">Miu<span className="text-[#D4AF37]">Invites</span></span>
                         </div>
                         <div className="flex gap-8 text-sm text-stone-500">
                             <a href="#" className="hover:text-white transition-colors">Termos</a>
@@ -373,7 +373,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                         </div>
                     </div>
                     <p className="text-stone-600 text-xs uppercase tracking-[0.2em]">
-                        &copy; {new Date().getFullYear()} ShareInvite Luxury Digital Stationery.
+                        &copy; {new Date().getFullYear()} Miu Invites Luxury Digital Stationery.
                     </p>
                 </div>
             </footer>

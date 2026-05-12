@@ -196,6 +196,27 @@ class EventController extends Controller
         ]);
     }
 
+    public function update(Request $request, Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:events,slug,' . $event->id,
+            'event_date' => 'required|date',
+        ]);
+
+        $event->update([
+            'title' => $validated['title'],
+            'slug' => Str::slug($validated['slug']),
+            'event_date' => $validated['event_date'],
+        ]);
+
+        return back()->with('success', 'Informações atualizadas!');
+    }
+
     public function pay(Event $event)
     {
         if ($event->user_id !== auth()->id()) {

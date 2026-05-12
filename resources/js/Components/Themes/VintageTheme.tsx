@@ -46,7 +46,7 @@ export default function VintageTheme({ event, locations, guides = [] }: ThemePro
                 <div className="absolute bottom-12 left-12 right-12 flex justify-between items-center text-[#bc6c25]/40 font-bold tracking-widest text-xs font-sans uppercase">
                     <span>MCMXXIV</span>
                     <div className="h-px flex-1 mx-8 bg-[#bc6c25]/20" />
-                    <span>ShareInvite Edition</span>
+                    <span>Miu Invites Edition</span>
                 </div>
             </section>
 

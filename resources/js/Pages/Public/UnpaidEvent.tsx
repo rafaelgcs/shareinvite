@@ -35,10 +35,10 @@ export default function UnpaidEvent({ event }) {
                 <div className="mt-12 pt-8 border-t border-white/5">
                     <p className="text-[10px] text-stone-600 uppercase tracking-[0.2em] font-bold mb-4">Desenvolvido por</p>
                     <div className="flex items-center justify-center gap-2">
-                        <div className="w-6 h-6 bg-white/10 rounded-full flex items-center justify-center">
-                            <span className="font-serif text-xs font-bold text-white italic">S</span>
+                        <div className="w-6 h-6 bg-[#D4AF37] rounded-full flex items-center justify-center">
+                            <span className="font-serif text-xs font-bold text-[#0A0A0A] italic">M</span>
                         </div>
-                        <span className="font-serif text-sm tracking-tight text-white/50">ShareInvite</span>
+                        <span className="font-serif text-sm tracking-tight text-white/50">Miu Invites</span>
                     </div>
                 </div>
             </motion.div>

@@ -1,3 +1,42 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    :root {
+        --primary-noir: #0A0A0A;
+        --secondary-gold: #D4AF37;
+        --accent-champagne: #F3E5AB;
+        --bg-soft: #F9F8F6;
+        --card-shadow: 0 10px 40px -10px rgba(0,0,0,0.05);
+    }
+
+    body {
+        @apply bg-stone-50 text-stone-900 font-sans antialiased;
+        font-family: 'Inter', sans-serif;
+    }
+
+    h1, h2, h3, h4, .font-serif {
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .premium-serif {
+        font-family: 'Playfair Display', serif;
+    }
+}
+
+@layer components {
+    .glass-card {
+        @apply bg-white/70 backdrop-blur-md border border-white/20 shadow-xl;
+    }
+    
+    .premium-button {
+        @apply relative overflow-hidden transition-all duration-300 transform hover:-translate-y-0.5 active:scale-95;
+    }
+    
+    .ambient-shadow {
+        box-shadow: var(--card-shadow);
+    }
+}
