@@ -19,6 +19,9 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import DangerButton from '@/Components/DangerButton';
 import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
+import { toast } from 'sonner';
+import ConfirmModal from '@/Components/ConfirmModal';
+import { QRCodeSVG } from 'qrcode.react';
 
 import { Event, Guest } from '@/types';
 
@@ -37,6 +40,8 @@ export default function Show({ event }: { event: Event }) {
     const [previewKey, setPreviewKey] = useState(0);
     const [selectedGuest, setSelectedGuest] = useState<any>(null);
     const [isSharingModalOpen, setIsSharingModalOpen] = useState(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [confirmAction, setConfirmAction] = useState<{ title: string, message: string, onConfirm: () => void } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortConfig, setSortConfig] = useState({ key: 'confirmed_at', direction: 'desc' });
@@ -88,6 +93,8 @@ export default function Show({ event }: { event: Event }) {
         e.preventDefault();
         putBasic(route('events.update', event.id), {
             preserveScroll: true,
+            onSuccess: () => toast.success('Informações atualizadas com sucesso!'),
+            onError: () => toast.error('Erro ao atualizar informações.')
         });
     };
 
@@ -118,6 +125,8 @@ export default function Show({ event }: { event: Event }) {
         postDesign(route('events.updateDesign', event.id), {
             forceFormData: true,
             preserveScroll: true,
+            onSuccess: () => toast.success('Design publicado com sucesso!'),
+            onError: () => toast.error('Erro ao publicar design.')
         });
     };
 
@@ -130,7 +139,10 @@ export default function Show({ event }: { event: Event }) {
     const submitLocation = (e) => {
         e.preventDefault();
         postLoc(route('events.locations.store', event.id), {
-            onSuccess: () => resetLoc()
+            onSuccess: () => {
+                resetLoc();
+                toast.success('Local adicionado!');
+            }
         });
     };
 
@@ -142,7 +154,10 @@ export default function Show({ event }: { event: Event }) {
     const submitNotice = (e) => {
         e.preventDefault();
         postNot(route('events.notices.store', event.id), {
-            onSuccess: () => resetNot()
+            onSuccess: () => {
+                resetNot();
+                toast.success('Aviso publicado!');
+            }
         });
     };
 
@@ -156,32 +171,55 @@ export default function Show({ event }: { event: Event }) {
     const submitGuide = (e) => {
         e.preventDefault();
         postGuide(route('events.guides.store', event.id), {
-            onSuccess: () => resetGuide()
+            onSuccess: () => {
+                resetGuide();
+                toast.success('Guia criado!');
+            }
         });
     };
 
     const deleteGuide = (id) => {
-        if (confirm('Remover guia?')) {
-            router.delete(route('events.guides.destroy', [event.id, id]));
-        }
+        setConfirmAction({
+            title: 'Remover Guia',
+            message: 'Deseja realmente remover este guia informativo?',
+            onConfirm: () => router.delete(route('events.guides.destroy', [event.id, id]), {
+                onSuccess: () => toast.success('Guia removido.')
+            })
+        });
+        setIsConfirmModalOpen(true);
     };
 
     const deleteGuest = (id) => {
-        if (confirm('Remover convidado da lista? Esta ação não pode ser desfeita.')) {
-            router.delete(route('guests.destroy', id));
-        }
+        setConfirmAction({
+            title: 'Remover Convidado',
+            message: 'Esta ação não pode ser desfeita. Remover convidado da lista?',
+            onConfirm: () => router.delete(route('guests.destroy', id), {
+                onSuccess: () => toast.success('Convidado removido.')
+            })
+        });
+        setIsConfirmModalOpen(true);
     };
 
     const deleteLocation = (id) => {
-        if (confirm('Remover local?')) {
-            router.delete(route('events.locations.destroy', [event.id, id]));
-        }
+        setConfirmAction({
+            title: 'Remover Local',
+            message: 'Deseja realmente remover este local do evento?',
+            onConfirm: () => router.delete(route('events.locations.destroy', [event.id, id]), {
+                onSuccess: () => toast.success('Local removido.')
+            })
+        });
+        setIsConfirmModalOpen(true);
     };
 
     const deleteNotice = (id) => {
-        if (confirm('Remover aviso?')) {
-            router.delete(route('events.notices.destroy', [event.id, id]));
-        }
+        setConfirmAction({
+            title: 'Remover Aviso',
+            message: 'Deseja realmente remover este aviso?',
+            onConfirm: () => router.delete(route('events.notices.destroy', [event.id, id]), {
+                onSuccess: () => toast.success('Aviso removido.')
+            })
+        });
+        setIsConfirmModalOpen(true);
     };
 
     const tabs = [
@@ -638,13 +676,22 @@ export default function Show({ event }: { event: Event }) {
                                                 <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight mb-2">Lista de Presença</h3>
                                                 <p className="text-stone-500 font-medium italic">Acompanhe quem já faz parte deste momento especial.</p>
                                             </div>
-                                            <a
-                                                href={route('events.guests.export', event.id)}
-                                                className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
-                                            >
-                                                <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                                Exportar CSV
-                                            </a>
+                                            <div className="flex flex-wrap gap-4">
+                                                <a
+                                                    href={route('events.guests.exportPdf', event.id)}
+                                                    className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
+                                                >
+                                                    <FileText className="w-5 h-5 group-hover:scale-110 transition-transform text-red-500" />
+                                                    Exportar PDF
+                                                </a>
+                                                <a
+                                                    href={route('events.guests.export', event.id)}
+                                                    className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
+                                                >
+                                                    <Download className="w-5 h-5 group-hover:scale-110 transition-transform text-green-600" />
+                                                    Exportar CSV
+                                                </a>
+                                            </div>
                                         </div>
 
                                         <div className="flex flex-col sm:flex-row gap-6 items-center justify-between bg-stone-50 p-6 rounded-[2.5rem] border border-stone-100">
@@ -781,6 +828,16 @@ export default function Show({ event }: { event: Event }) {
                                                                 </td>
                                                                 <td className="px-8 py-6 text-right">
                                                                     <div className="flex items-center justify-end gap-3">
+                                                                        <button 
+                                                                            onClick={() => {
+                                                                                setSelectedGuest(guest);
+                                                                                setIsSharingModalOpen(true);
+                                                                            }} 
+                                                                            className="p-3 text-stone-300 hover:text-[#D4AF37] hover:bg-stone-50 rounded-xl transition-all" 
+                                                                            title="Compartilhar Convite"
+                                                                        >
+                                                                            <Share2 className="w-5 h-5" />
+                                                                        </button>
                                                                         <button onClick={() => deleteGuest(guest.id)} className="p-3 text-stone-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all" title="Remover Convidado">
                                                                             <Trash2 className="w-5 h-5" />
                                                                         </button>
@@ -1048,40 +1105,118 @@ export default function Show({ event }: { event: Event }) {
                 </div>
             </div>
 
-            {/* Animation Preview Modal */}
-            <Modal show={isSharingModalOpen && selectedGuest?.type === 'anim_preview'} onClose={() => setIsSharingModalOpen(false)} maxWidth="2xl">
-                <div className="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-stone-100 h-[600px] relative">
+            {/* Sharing & Preview Modal */}
+            <Modal show={isSharingModalOpen} onClose={() => setIsSharingModalOpen(false)} maxWidth="2xl">
+                <div className="bg-white rounded-[3rem] overflow-hidden shadow-2xl border border-stone-100 relative">
                     <button
                         onClick={() => setIsSharingModalOpen(false)}
-                        className="absolute top-8 right-8 z-[60] w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-[#0A0A0A] hover:bg-white transition-all shadow-xl"
+                        className="absolute top-8 right-8 z-[60] w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-[#0A0A0A] hover:bg-white transition-all shadow-xl border border-stone-100"
                     >
                         <X className="w-6 h-6" />
                     </button>
 
-                    <EnvelopeAnimation
-                        isPreview={true}
-                        animationType={selectedGuest?.animId}
-                        primaryColor={designData.primary_color}
-                        secondaryColor={designData.secondary_color}
-                        textColor={designData.text_color}
-                        backgroundColor={designData.background_color}
-                        logo={event.logo}
-                        title={event.title}
-                    >
-                        <div className="h-full flex flex-col items-center justify-center p-12 text-center">
-                            <Sparkles className="w-12 h-12 text-[#D4AF37] mb-6" />
-                            <h3 className="font-serif text-3xl font-black mb-4">Seu Convite Aparecerá Aqui</h3>
-                            <p className="text-stone-500 max-w-sm mx-auto">Esta é uma demonstração de como seus convidados experimentarão a abertura do seu evento.</p>
-                            <button
-                                onClick={() => setIsSharingModalOpen(false)}
-                                className="mt-8 px-8 py-4 bg-[#0A0A0A] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-black/20"
+                    {selectedGuest?.type === 'anim_preview' ? (
+                        <div className="h-[600px] relative">
+                            <EnvelopeAnimation
+                                isPreview={true}
+                                animationType={selectedGuest?.animId}
+                                primaryColor={designData.primary_color}
+                                secondaryColor={designData.secondary_color}
+                                textColor={designData.text_color}
+                                backgroundColor={designData.background_color}
+                                logo={event.logo}
+                                title={event.title}
                             >
-                                Selecionar este Design
-                            </button>
+                                <div className="h-full flex flex-col items-center justify-center p-12 text-center">
+                                    <Sparkles className="w-12 h-12 text-[#D4AF37] mb-6" />
+                                    <h3 className="font-serif text-3xl font-black mb-4">Seu Convite Aparecerá Aqui</h3>
+                                    <p className="text-stone-500 max-w-sm mx-auto">Esta é uma demonstração de como seus convidados experimentarão a abertura do seu evento.</p>
+                                    <button
+                                        onClick={() => setIsSharingModalOpen(false)}
+                                        className="mt-8 px-8 py-4 bg-[#0A0A0A] text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-black/20"
+                                    >
+                                        Selecionar este Design
+                                    </button>
+                                </div>
+                            </EnvelopeAnimation>
                         </div>
-                    </EnvelopeAnimation>
+                    ) : (
+                        <div className="p-10 sm:p-16">
+                            <div className="flex items-center gap-4 mb-10">
+                                <div className="w-16 h-16 bg-[#D4AF37]/10 rounded-2xl flex items-center justify-center">
+                                    <Share2 className="w-8 h-8 text-[#D4AF37]" />
+                                </div>
+                                <div>
+                                    <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight">Compartilhar Convite</h3>
+                                    <p className="text-stone-500 italic">Envie o acesso personalizado para {selectedGuest?.name}.</p>
+                                </div>
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-10">
+                                <div className="space-y-8">
+                                    <div className="p-8 bg-stone-50 rounded-[2rem] border border-stone-100">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-6">Link de Acesso Direto</p>
+                                        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-stone-200">
+                                            <input 
+                                                readOnly 
+                                                value={window.location.origin + "/g/" + selectedGuest?.uuid} 
+                                                className="flex-1 bg-transparent border-none text-xs font-bold text-stone-600 focus:ring-0"
+                                            />
+                                            <button 
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(window.location.origin + "/g/" + selectedGuest?.uuid);
+                                                    toast.success('Link copiado!');
+                                                }}
+                                                className="p-3 bg-[#0A0A0A] text-[#D4AF37] rounded-lg shadow-lg"
+                                            >
+                                                <FileText className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-2">Ações Rápidas</p>
+                                        <a 
+                                            href={`https://wa.me/${selectedGuest?.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${selectedGuest?.name}! Aqui está o seu convite oficial para o evento ${event.title}: ${window.location.origin}/g/${selectedGuest?.uuid}`)}`}
+                                            target="_blank"
+                                            className="w-full py-5 bg-[#25D366] text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-green-100 hover:scale-[1.02] transition-all"
+                                        >
+                                            <Zap className="w-5 h-5 fill-white" />
+                                            Enviar via WhatsApp
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col items-center justify-center p-10 bg-[#FCFBF8] border border-[#D4AF37]/20 rounded-[2.5rem] relative">
+                                    <div className="absolute top-4 right-6">
+                                        <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">QR Code Individual</span>
+                                    </div>
+                                    <div className="bg-white p-6 rounded-3xl shadow-2xl shadow-[#D4AF37]/10 border-4 border-white mb-6">
+                                        <QRCodeSVG 
+                                            value={window.location.origin + "/g/" + selectedGuest?.uuid}
+                                            size={160}
+                                            level="H"
+                                            includeMargin={false}
+                                        />
+                                    </div>
+                                    <p className="text-[10px] text-center text-stone-400 font-bold uppercase tracking-widest leading-relaxed">
+                                        O convidado pode escanear<br/>este código para entrar.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </Modal>
+
+            {/* Global Confirmation Modal */}
+            <ConfirmModal 
+                show={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={confirmAction?.onConfirm || (() => {})}
+                title={confirmAction?.title || ''}
+                message={confirmAction?.message || ''}
+            />
             <div className="h-32 lg:h-0" />
 
             {!event.is_paid && (

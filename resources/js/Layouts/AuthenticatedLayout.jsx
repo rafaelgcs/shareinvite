@@ -6,6 +6,7 @@ import { Link, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, User, LogOut, Menu, X, ChevronDown, Bell, Settings, Crown, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Toaster } from 'sonner';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -20,6 +21,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
     return (
         <div className="min-h-screen bg-[#F9F8F6]">
+            <Toaster position="top-center" richColors theme="light" expand={true} />
             <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b ${
                 scrolled 
                 ? 'bg-white/80 backdrop-blur-xl border-stone-200/60 py-2 shadow-[0_2px_20px_-10px_rgba(0,0,0,0.05)]' 

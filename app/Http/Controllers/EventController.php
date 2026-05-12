@@ -6,6 +6,7 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class EventController extends Controller
 {
@@ -190,6 +191,24 @@ class EventController extends Controller
         };
 
         return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportGuestsPdf(Event $event)
+    {
+        if ($event->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $guests = $event->guests()->latest()->get();
+        
+        $pdf = Pdf::loadView('pdf.guests', [
+            'event' => $event,
+            'guests' => $guests
+        ]);
+
+        $filename = "lista-presenca-" . Str::slug($event->title) . "-" . now()->format('Y-m-d') . ".pdf";
+
+        return $pdf->download($filename);
     }
 
     public function checkout(Event $event)

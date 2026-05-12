@@ -4,11 +4,14 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 import { CreditCard, ShieldCheck, Zap, Star, Check, ArrowLeft, Lock, Sparkles } from 'lucide-react';
 import { useState } from 'react';
+import ConfirmModal from '@/Components/ConfirmModal';
+import { toast } from 'sonner';
 
 import { Event } from '@/types';
 
 export default function Checkout({ event }: { event: Event }) {
     const [selectedPlan, setSelectedPlan] = useState('premium');
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const { post, processing } = useForm();
 
     const plans = [
@@ -47,10 +50,7 @@ export default function Checkout({ event }: { event: Event }) {
             }
         } catch (error) {
             console.error('Erro ao iniciar checkout:', error);
-            // Fallback for dev environment without Stripe keys
-            if (confirm('Ambiente de teste detectado. Deseja ativar este convite gratuitamente para teste?')) {
-                window.location.href = route('stripe.success', { event: event.id, sid: 'mock_session' });
-            }
+            setIsConfirmModalOpen(true);
         }
     };
 
@@ -215,6 +215,20 @@ export default function Checkout({ event }: { event: Event }) {
                     </div>
                 </div>
             </div>
+
+            <ConfirmModal 
+                show={isConfirmModalOpen}
+                onClose={() => setIsConfirmModalOpen(false)}
+                onConfirm={() => {
+                    toast.success('Ativando modo de teste...');
+                    window.location.href = route('stripe.success', { event: event.id, sid: 'mock_session' });
+                }}
+                variant="info"
+                title="Modo de Teste"
+                message="Deseja ativar este convite gratuitamente para teste?"
+                confirmText="Ativar Grátis"
+                cancelText="Cancelar"
+            />
         </AuthenticatedLayout>
     );
 }
