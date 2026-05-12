@@ -20,22 +20,28 @@ class DemoSeeder extends Seeder
     public function run(): void
     {
         // 1. Create Plans
-        $premiumPlan = Plan::updateOrCreate(['name' => 'Premium'], [
-            'guest_limit' => 200,
-            'duration_months' => 3,
-            'price' => 99.00,
-        ]);
-
-        Plan::updateOrCreate(['name' => 'Classic'], [
+        $classicPlan = Plan::updateOrCreate(['slug' => 'classic'], [
+            'name' => 'Essencial',
             'guest_limit' => 50,
             'duration_months' => 3,
             'price' => 49.00,
+            'features' => ['rsvp', 'map', 'single_location'],
         ]);
 
-        Plan::updateOrCreate(['name' => 'Luxury'], [
-            'guest_limit' => 9999,
+        $premiumPlan = Plan::updateOrCreate(['slug' => 'premium'], [
+            'name' => 'Premium',
+            'guest_limit' => 200,
+            'duration_months' => 6,
+            'price' => 99.00,
+            'features' => ['rsvp', 'map', 'multi_location', 'mural', 'scanner', 'animations_premium'],
+        ]);
+
+        $luxuryPlan = Plan::updateOrCreate(['slug' => 'luxury'], [
+            'name' => 'VIP',
+            'guest_limit' => 1000,
             'duration_months' => 12,
             'price' => 199.00,
+            'features' => ['rsvp', 'map', 'multi_location', 'mural', 'scanner', 'animations_premium', 'custom_domain', 'vip_support'],
         ]);
 
         // 2. Create Test User

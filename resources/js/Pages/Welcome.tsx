@@ -66,7 +66,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
         {
             name: "Luxury",
             price: "R$ 199",
-            features: ["Convidados Ilimitados", "Personalização Total", "Domínio Próprio", "Suporte VIP 24h", "Exportação de Dados"],
+            features: ["Convidados Ilimitados", "Personalização Total", "Suporte VIP 24h", "Exportação de Dados"],
             recommended: false
         }
     ];
@@ -98,8 +98,8 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                             </Link>
                         )}
                         {canRegister && (
-                            <Link 
-                                href={route('register')} 
+                            <Link
+                                href={route('register')}
                                 className="px-5 py-2.5 bg-white text-stone-950 rounded-full text-sm font-bold hover:bg-stone-200 transition-all shadow-lg transform hover:scale-105"
                             >
                                 Criar Conta
@@ -132,7 +132,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                             <p className="text-xl text-stone-400 font-light max-w-lg mb-10 leading-relaxed">
                                 Transforme o primeiro contato dos seus convidados em uma experiência memorável. Design premium, RSVP automatizado e gestão total.
                             </p>
-                            
+
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <Link href={route('register')} className="px-10 py-5 bg-white text-stone-950 rounded-full text-lg font-bold hover:bg-stone-200 transition-all shadow-2xl flex items-center justify-center gap-2 group">
                                     Começar agora <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -150,16 +150,16 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                             className="relative flex justify-center lg:justify-end"
                         >
                             <div className="relative w-[320px] sm:w-[400px] aspect-[9/19] bg-stone-900 rounded-[3rem] border-[8px] border-stone-800 shadow-[0_0_100px_rgba(0,0,0,0.5)] overflow-hidden">
-                                <img 
-                                    src="/assets/hero-mockup.png" 
-                                    alt="Mockup Convite" 
+                                <img
+                                    src="/assets/hero-mockup.png"
+                                    alt="Mockup Convite"
                                     className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-stone-950/50 to-transparent pointer-events-none" />
                             </div>
-                            
+
                             {/* Floating labels */}
-                            <motion.div 
+                            <motion.div
                                 animate={{ y: [0, -10, 0] }}
                                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                 className="absolute -left-4 top-1/4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl hidden md:block"
@@ -175,7 +175,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                                 </div>
                             </motion.div>
 
-                            <motion.div 
+                            <motion.div
                                 animate={{ y: [0, 10, 0] }}
                                 transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
                                 className="absolute -right-8 bottom-1/4 bg-white/10 backdrop-blur-xl p-4 rounded-2xl border border-white/20 shadow-2xl hidden md:block"
@@ -239,7 +239,7 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                                         <div className="w-12 h-12 bg-stone-100 rounded-full mx-auto mb-4" />
                                         <h4 className="font-serif text-2xl mb-2">Maria & João</h4>
                                         <p className="text-xs text-stone-400 uppercase tracking-widest mb-8">Confirmar Presença</p>
-                                        
+
                                         <div className="space-y-4 text-left">
                                             <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100">
                                                 <p className="text-[10px] text-stone-400 uppercase tracking-widest font-bold">Convidado</p>
@@ -303,13 +303,12 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
 
                     <div className="grid md:grid-cols-3 gap-8">
                         {plans.map((plan, idx) => (
-                            <div 
+                            <div
                                 key={idx}
-                                className={`p-10 rounded-[3rem] border transition-all ${
-                                    plan.recommended 
-                                    ? 'bg-white text-stone-950 border-white scale-105 z-10' 
-                                    : 'bg-stone-900/50 text-white border-white/5'
-                                }`}
+                                className={`p-10 rounded-[3rem] border transition-all ${plan.recommended
+                                        ? 'bg-white text-stone-950 border-white scale-105 z-10'
+                                        : 'bg-stone-900/50 text-white border-white/5'
+                                    }`}
                             >
                                 <h4 className="text-xl font-bold mb-2 uppercase tracking-widest">{plan.name}</h4>
                                 <div className="flex items-baseline gap-1 mb-8">
@@ -324,13 +323,12 @@ export default function Welcome({ canLogin, canRegister }: { canLogin: boolean, 
                                         </li>
                                     ))}
                                 </ul>
-                                <Link 
+                                <Link
                                     href={route('register')}
-                                    className={`w-full py-4 rounded-full text-center font-bold transition-all ${
-                                        plan.recommended 
-                                        ? 'bg-stone-950 text-white hover:bg-stone-800' 
-                                        : 'bg-white text-stone-950 hover:bg-stone-200'
-                                    }`}
+                                    className={`w-full py-4 rounded-full text-center font-bold transition-all ${plan.recommended
+                                            ? 'bg-stone-950 text-white hover:bg-stone-800'
+                                            : 'bg-white text-stone-950 hover:bg-stone-200'
+                                        }`}
                                 >
                                     Escolher Plano
                                 </Link>

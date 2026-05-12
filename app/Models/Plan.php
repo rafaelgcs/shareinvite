@@ -12,9 +12,16 @@ class Plan extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'guest_limit',
         'duration_months',
         'price',
+        'features',
+    ];
+
+    protected $casts = [
+        'features' => 'array',
+        'price' => 'decimal:2',
     ];
 
     public function events(): HasMany

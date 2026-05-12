@@ -77,7 +77,7 @@ class EventController extends Controller
             abort(403);
         }
 
-        $event->load(['locations', 'notices', 'guests', 'guides']);
+        $event->load(['locations', 'notices', 'guests', 'guides', 'plan']);
 
         return Inertia::render('Events/Show', [
             'event' => $event,
@@ -216,6 +216,8 @@ class EventController extends Controller
         if ($event->user_id !== auth()->id()) {
             abort(403);
         }
+
+        $event->load('plan');
 
         return Inertia::render('Events/Checkout', [
             'event' => $event,

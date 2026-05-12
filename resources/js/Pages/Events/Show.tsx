@@ -7,8 +7,9 @@ import {
     Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock,
     Share2, Download, X, FileText, Upload, Search, ChevronUp,
     ChevronDown, ArrowUpDown, Filter, Sparkles, LayoutDashboard,
-    Zap,
-    ArrowRight
+    Zap, Lock,
+    ArrowRight,
+    Star
 } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import DigitalTicket from '@/Components/Invitation/DigitalTicket';
@@ -101,7 +102,17 @@ export default function Show({ event }: { event: Event }) {
     const counts = {
         all: guestList.length,
         present: guestList.filter(g => g.checked_in_at).length,
-        waiting: guestList.filter(g => !g.checked_in_at).length
+        waiting: guestList.filter(g => !g.checked_in_at).length,
+        totalConf: guestList.reduce((acc, g) => acc + 1 + (g.extra_guests || 0), 0)
+    };
+
+    const guestLimit = event.plan ? event.plan.guest_limit : 50;
+    const progressPercent = Math.min((counts.totalConf / guestLimit) * 100, 100);
+
+    const canAccessFeature = (feature: string) => {
+        if (!event.is_paid) return ['rsvp', 'map'].includes(feature);
+        if (!event.plan) return false;
+        return event.plan.features?.includes(feature);
     };
 
     const { data: designData, setData: setDesignData, post: postDesign, processing: processingDesign, recentlySuccessful: designSuccess } = useForm({
@@ -254,10 +265,23 @@ export default function Show({ event }: { event: Event }) {
                     </div>
                     <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
                         <Link
-                            href={route('events.checkIn', event.id)}
-                            className="premium-button flex items-center justify-center gap-3 bg-[#0A0A0A] text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-black/10 w-full sm:w-auto"
+                            href={canAccessFeature('scanner') ? route('events.checkIn', event.id) : '#'}
+                            onClick={(e) => {
+                                if (!canAccessFeature('scanner')) {
+                                    e.preventDefault();
+                                    toast.error('O Scanner de Entrada está disponível apenas nos planos Premium e VIP.');
+                                }
+                            }}
+                            className={`premium-button flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-black/10 w-full sm:w-auto transition-all ${canAccessFeature('scanner')
+                                    ? 'bg-[#0A0A0A] text-white hover:scale-105'
+                                    : 'bg-stone-100 text-stone-400 cursor-not-allowed opacity-60'
+                                }`}
                         >
-                            <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
+                            {canAccessFeature('scanner') ? (
+                                <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
+                            ) : (
+                                <Lock className="w-5 h-5" />
+                            )}
                             Scanner de Entrada
                         </Link>
                         <Link
@@ -378,6 +402,54 @@ export default function Show({ event }: { event: Event }) {
                                                 )}
                                             </div>
                                         </form>
+
+                                        {/* Seu Plano */}
+                                        <div className="pt-16 border-t border-stone-100">
+                                            <div className="flex items-center gap-3 mb-8">
+                                                <Star className="w-7 h-7 text-[#D4AF37]" />
+                                                <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Status do Convite</h3>
+                                            </div>
+
+                                            <div className="bg-[#0A0A0A] rounded-[3.5rem] p-10 sm:p-14 text-white relative overflow-hidden shadow-2xl group">
+                                                <div className="absolute top-0 right-0 w-80 h-80 bg-[#D4AF37]/10 rounded-full filter blur-3xl -translate-y-1/2 translate-x-1/2 transition-transform group-hover:scale-110 duration-700" />
+
+                                                <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-10">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-4 mb-4">
+                                                            <span className="text-[#D4AF37] font-black uppercase text-[10px] tracking-[0.4em]">Sua Assinatura</span>
+                                                            <div className="h-px w-12 bg-white/10" />
+                                                        </div>
+                                                        <h4 className="text-5xl font-serif font-black italic mb-4 tracking-tighter">
+                                                            {event.plan?.name || 'Convite em Teste'}
+                                                        </h4>
+                                                        <div className="flex flex-wrap gap-4 items-center">
+                                                            <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+                                                                <Users className="w-4 h-4 text-[#D4AF37]" />
+                                                                <span className="text-[11px] font-black uppercase tracking-widest text-white/70">
+                                                                    {event.plan ? `${event.plan.guest_limit} Convidados` : 'Limite de Teste'}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-full border border-white/10">
+                                                                <Clock className="w-4 h-4 text-[#D4AF37]" />
+                                                                <span className="text-[11px] font-black uppercase tracking-widest text-white/70">
+                                                                    {event.plan ? `${event.plan.duration_months} Meses` : 'Acesso Temporário'}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    {(event.plan?.slug !== 'luxury') && (
+                                                        <Link
+                                                            href={route('events.checkout', event.id)}
+                                                            className="premium-button flex items-center justify-center gap-3 px-12 py-6 bg-[#D4AF37] text-[#0A0A0A] rounded-[2rem] font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-[#D4AF37]/20 group/btn"
+                                                        >
+                                                            <Zap className="w-6 h-6 group-hover/btn:fill-current" />
+                                                            {event.is_paid ? 'Fazer Upgrade' : 'Ativar Convite'}
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                                 {activeTab === 'settings' && (
@@ -545,45 +617,63 @@ export default function Show({ event }: { event: Event }) {
 
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                                     {[
-                                                        { id: 'envelope_3d', label: 'Envelope 3D Premium', desc: 'Abertura física realista' },
-                                                        { id: 'gate_fold', label: 'Janela (Gate Fold)', desc: 'Portas que se abrem ao meio' },
-                                                        { id: 'slipcase', label: 'Luva Deslizante (Slipcase)', desc: 'Convite desliza para fora' },
-                                                        { id: 'wax_seal', label: 'Selo de Cera (Wax Seal)', desc: 'Foco no selo de marca' },
-                                                        { id: 'fade_in', label: 'Minimalista (Fade)', desc: 'Surgimento suave e etéreo' },
-                                                    ].map((anim) => (
-                                                        <div
-                                                            key={anim.id}
-                                                            className={`group p-6 rounded-[2rem] border-2 transition-all flex flex-col gap-4 ${designData.animation_type === anim.id
-                                                                ? 'border-[#0A0A0A] bg-stone-50'
-                                                                : 'border-stone-100 hover:border-stone-200 bg-white'
-                                                                }`}
-                                                        >
-                                                            <div className="flex items-center justify-between">
-                                                                <div
-                                                                    onClick={() => setDesignData('animation_type', anim.id)}
-                                                                    className="cursor-pointer flex-1"
-                                                                >
-                                                                    <p className="font-black text-xs uppercase tracking-widest text-[#0A0A0A] mb-1">{anim.label}</p>
-                                                                    <p className="text-[10px] text-stone-400 font-medium">{anim.desc}</p>
-                                                                </div>
-                                                                <div
-                                                                    onClick={() => setDesignData('animation_type', anim.id)}
-                                                                    className={`w-6 h-6 rounded-full border-4 cursor-pointer ${designData.animation_type === anim.id ? 'border-[#D4AF37]' : 'border-stone-100'}`}
-                                                                />
-                                                            </div>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setSelectedGuest({ type: 'anim_preview', animId: anim.id });
-                                                                    setIsSharingModalOpen(true);
-                                                                }}
-                                                                className="w-full py-3 bg-white border border-stone-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-[#0A0A0A] hover:border-[#D4AF37] transition-all flex items-center justify-center gap-2"
+                                                        { id: 'envelope_3d', label: 'Envelope 3D Premium', desc: 'Abertura física realista', premium: true },
+                                                        { id: 'gate_fold', label: 'Janela (Gate Fold)', desc: 'Portas que se abrem ao meio', premium: true },
+                                                        { id: 'slipcase', label: 'Luva Deslizante (Slipcase)', desc: 'Convite desliza para fora', premium: true },
+                                                        { id: 'wax_seal', label: 'Selo de Cera (Wax Seal)', desc: 'Foco no selo de marca', premium: true },
+                                                        { id: 'fade_in', label: 'Minimalista (Fade)', desc: 'Surgimento suave e etéreo', premium: false },
+                                                    ].map((anim) => {
+                                                        const isLocked = anim.premium && !canAccessFeature('animations_premium');
+                                                        return (
+                                                            <div
+                                                                key={anim.id}
+                                                                className={`group p-6 rounded-[2rem] border-2 transition-all flex flex-col gap-4 relative overflow-hidden ${designData.animation_type === anim.id
+                                                                    ? 'border-[#0A0A0A] bg-stone-50'
+                                                                    : 'border-stone-100 hover:border-stone-200 bg-white'
+                                                                    } ${isLocked ? 'opacity-60 grayscale-[0.5]' : ''}`}
                                                             >
-                                                                <ExternalLink className="w-3 h-3" />
-                                                                Visualizar Demonstração
-                                                            </button>
-                                                        </div>
-                                                    ))}
+                                                                <div className="flex items-center justify-between">
+                                                                    <div
+                                                                        onClick={() => !isLocked && setDesignData('animation_type', anim.id)}
+                                                                        className={`flex-1 ${isLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+                                                                    >
+                                                                        <div className="flex items-center gap-2 mb-1">
+                                                                            <p className="font-black text-xs uppercase tracking-widest text-[#0A0A0A]">{anim.label}</p>
+                                                                            {anim.premium && <Sparkles className="w-3 h-3 text-[#D4AF37] fill-[#D4AF37]" />}
+                                                                        </div>
+                                                                        <p className="text-[10px] text-stone-400 font-medium">{anim.desc}</p>
+                                                                    </div>
+                                                                    <div
+                                                                        onClick={() => !isLocked && setDesignData('animation_type', anim.id)}
+                                                                        className={`w-6 h-6 rounded-full border-4 ${isLocked ? 'cursor-not-allowed border-stone-200 bg-stone-100' : 'cursor-pointer'} ${designData.animation_type === anim.id ? 'border-[#D4AF37]' : 'border-stone-100'}`}
+                                                                    >
+                                                                        {isLocked && <Lock className="w-2 h-2 text-stone-400 m-auto mt-1" />}
+                                                                    </div>
+                                                                </div>
+
+                                                                {isLocked ? (
+                                                                    <Link
+                                                                        href={route('events.checkout', event.id)}
+                                                                        className="w-full py-3 bg-stone-100 border border-stone-200 rounded-xl text-[9px] font-black uppercase tracking-widest text-stone-400 hover:text-[#0A0A0A] hover:bg-[#D4AF37]/10 transition-all flex items-center justify-center gap-2"
+                                                                    >
+                                                                        <Zap className="w-3 h-3 text-[#D4AF37]" /> Upgrade para Premium
+                                                                    </Link>
+                                                                ) : (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => {
+                                                                            setSelectedGuest({ type: 'anim_preview', animId: anim.id });
+                                                                            setIsSharingModalOpen(true);
+                                                                        }}
+                                                                        className="w-full py-3 bg-white border border-stone-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-[#0A0A0A] hover:border-[#D4AF37] transition-all flex items-center justify-center gap-2"
+                                                                    >
+                                                                        <ExternalLink className="w-3 h-3" />
+                                                                        Visualizar Demonstração
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
 
@@ -671,27 +761,56 @@ export default function Show({ event }: { event: Event }) {
 
                                 {activeTab === 'guests' && (
                                     <div className="space-y-10">
-                                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                                            <div>
-                                                <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight mb-2">Lista de Presença</h3>
-                                                <p className="text-stone-500 font-medium italic">Acompanhe quem já faz parte deste momento especial.</p>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-end mb-3">
+                                                <div>
+                                                    <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight mb-1">Lista de Presença</h3>
+                                                    <p className="text-stone-500 font-medium italic">Acompanhe quem já faz parte deste momento especial.</p>
+                                                </div>
+                                                <div className="text-right hidden sm:block">
+                                                    <span className="text-[10px] font-black uppercase tracking-widest text-stone-400">Limite de Convidados</span>
+                                                    <p className="text-xl font-serif font-black text-[#0A0A0A]">
+                                                        {counts.totalConf} <span className="text-stone-300">/</span> {guestLimit}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div className="flex flex-wrap gap-4">
-                                                <a
-                                                    href={route('events.guests.exportPdf', event.id)}
-                                                    className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
-                                                >
-                                                    <FileText className="w-5 h-5 group-hover:scale-110 transition-transform text-red-500" />
-                                                    Exportar PDF
-                                                </a>
-                                                <a
-                                                    href={route('events.guests.export', event.id)}
-                                                    className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
-                                                >
-                                                    <Download className="w-5 h-5 group-hover:scale-110 transition-transform text-green-600" />
-                                                    Exportar CSV
-                                                </a>
+
+                                            {/* Progress Bar */}
+                                            <div className="w-full h-3 bg-stone-100 rounded-full overflow-hidden mb-2 shadow-inner border border-stone-200/50">
+                                                <motion.div
+                                                    initial={{ width: 0 }}
+                                                    animate={{ width: `${progressPercent}%` }}
+                                                    transition={{ duration: 1, ease: "easeOut" }}
+                                                    className={`h-full transition-colors duration-500 ${progressPercent > 90 ? 'bg-red-500' : progressPercent > 70 ? 'bg-[#D4AF37]' : 'bg-[#0A0A0A]'
+                                                        }`}
+                                                />
                                             </div>
+                                            <div className="flex justify-between items-center px-1">
+                                                <p className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter">
+                                                    {counts.totalConf} confirmados (incluindo acompanhantes)
+                                                </p>
+                                                {progressPercent >= 100 && (
+                                                    <p className="text-[9px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1">
+                                                        <Zap className="w-3 h-3 fill-red-500" /> Limite Atingido
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-wrap gap-4 self-end">
+                                            <a
+                                                href={route('events.guests.exportPdf', event.id)}
+                                                className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
+                                            >
+                                                <FileText className="w-5 h-5 group-hover:scale-110 transition-transform text-red-500" />
+                                                Exportar PDF
+                                            </a>
+                                            <a
+                                                href={route('events.guests.export', event.id)}
+                                                className="premium-button flex items-center gap-3 px-8 py-4 bg-white border-2 border-stone-100 rounded-2xl text-xs font-black text-[#0A0A0A] hover:border-[#D4AF37] transition-all shadow-sm group"
+                                            >
+                                                <Download className="w-5 h-5 group-hover:scale-110 transition-transform text-green-600" />
+                                                Exportar CSV
+                                            </a>
                                         </div>
 
                                         <div className="flex flex-col sm:flex-row gap-6 items-center justify-between bg-stone-50 p-6 rounded-[2.5rem] border border-stone-100">
@@ -828,12 +947,12 @@ export default function Show({ event }: { event: Event }) {
                                                                 </td>
                                                                 <td className="px-8 py-6 text-right">
                                                                     <div className="flex items-center justify-end gap-3">
-                                                                        <button 
+                                                                        <button
                                                                             onClick={() => {
                                                                                 setSelectedGuest(guest);
                                                                                 setIsSharingModalOpen(true);
-                                                                            }} 
-                                                                            className="p-3 text-stone-300 hover:text-[#D4AF37] hover:bg-stone-50 rounded-xl transition-all" 
+                                                                            }}
+                                                                            className="p-3 text-stone-300 hover:text-[#D4AF37] hover:bg-stone-50 rounded-xl transition-all"
                                                                             title="Compartilhar Convite"
                                                                         >
                                                                             <Share2 className="w-5 h-5" />
@@ -858,6 +977,11 @@ export default function Show({ event }: { event: Event }) {
                                             <div>
                                                 <h3 className="font-serif text-4xl text-[#0A0A0A] font-black tracking-tight mb-2">Locais do Evento</h3>
                                                 <p className="text-stone-500 font-medium">Onde a magia acontece. Adicione cerimônia, recepção ou outros.</p>
+                                                {!canAccessFeature('multi_location') && event.locations.length >= 1 && (
+                                                    <p className="mt-2 text-[10px] font-black text-[#D4AF37] uppercase tracking-widest flex items-center gap-2 bg-[#D4AF37]/5 px-4 py-2 rounded-xl border border-[#D4AF37]/10 w-fit">
+                                                        <Lock className="w-3 h-3" /> Limite de 1 local atingido (Plano Essencial)
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
 
@@ -1157,12 +1281,12 @@ export default function Show({ event }: { event: Event }) {
                                     <div className="p-8 bg-stone-50 rounded-[2rem] border border-stone-100">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 mb-6">Link de Acesso Direto</p>
                                         <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-stone-200">
-                                            <input 
-                                                readOnly 
-                                                value={window.location.origin + "/g/" + selectedGuest?.uuid} 
+                                            <input
+                                                readOnly
+                                                value={window.location.origin + "/g/" + selectedGuest?.uuid}
                                                 className="flex-1 bg-transparent border-none text-xs font-bold text-stone-600 focus:ring-0"
                                             />
-                                            <button 
+                                            <button
                                                 onClick={() => {
                                                     navigator.clipboard.writeText(window.location.origin + "/g/" + selectedGuest?.uuid);
                                                     toast.success('Link copiado!');
@@ -1176,7 +1300,7 @@ export default function Show({ event }: { event: Event }) {
 
                                     <div className="space-y-4">
                                         <p className="text-[10px] font-black uppercase tracking-widest text-stone-400 px-2">Ações Rápidas</p>
-                                        <a 
+                                        <a
                                             href={`https://wa.me/${selectedGuest?.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá ${selectedGuest?.name}! Aqui está o seu convite oficial para o evento ${event.title}: ${window.location.origin}/g/${selectedGuest?.uuid}`)}`}
                                             target="_blank"
                                             className="w-full py-5 bg-[#25D366] text-white rounded-2xl font-black uppercase text-xs tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-green-100 hover:scale-[1.02] transition-all"
@@ -1192,7 +1316,7 @@ export default function Show({ event }: { event: Event }) {
                                         <span className="text-[10px] font-black text-[#D4AF37] uppercase tracking-widest">QR Code Individual</span>
                                     </div>
                                     <div className="bg-white p-6 rounded-3xl shadow-2xl shadow-[#D4AF37]/10 border-4 border-white mb-6">
-                                        <QRCodeSVG 
+                                        <QRCodeSVG
                                             value={window.location.origin + "/g/" + selectedGuest?.uuid}
                                             size={160}
                                             level="H"
@@ -1200,7 +1324,7 @@ export default function Show({ event }: { event: Event }) {
                                         />
                                     </div>
                                     <p className="text-[10px] text-center text-stone-400 font-bold uppercase tracking-widest leading-relaxed">
-                                        O convidado pode escanear<br/>este código para entrar.
+                                        O convidado pode escanear<br />este código para entrar.
                                     </p>
                                 </div>
                             </div>
@@ -1210,10 +1334,10 @@ export default function Show({ event }: { event: Event }) {
             </Modal>
 
             {/* Global Confirmation Modal */}
-            <ConfirmModal 
+            <ConfirmModal
                 show={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}
-                onConfirm={confirmAction?.onConfirm || (() => {})}
+                onConfirm={confirmAction?.onConfirm || (() => { })}
                 title={confirmAction?.title || ''}
                 message={confirmAction?.message || ''}
             />

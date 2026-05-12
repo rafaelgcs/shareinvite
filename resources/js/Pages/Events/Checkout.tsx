@@ -17,34 +17,50 @@ export default function Checkout({ event }: { event: Event }) {
     const plans = [
         {
             id: 'classic',
-            name: 'Classic',
+            name: 'Essencial',
             price: 49,
             guests: 50,
-            features: ['RSVP Básico', 'Mapa do Local', 'Suporte por E-mail', 'Design Clássico']
+            duration: '3 meses',
+            features: ['RSVP Básico', 'Mapa do Local', '1 Local do Evento', 'Design Clássico']
         },
         {
             id: 'premium',
             name: 'Premium',
             price: 99,
             guests: 200,
+            duration: '6 meses',
             features: ['Mural de Fotos', 'Scanner de Entrada', 'Múltiplos Locais', 'Animações 3D Premium']
         },
         {
             id: 'luxury',
-            name: 'Luxury',
+            name: 'VIP',
             price: 199,
-            guests: 'Ilimitados',
-            features: ['Personalização Total', 'Domínio Próprio', 'Suporte VIP 24h', 'Exportação de Dados']
+            guests: 1000,
+            duration: '12 meses',
+            features: ['Tudo do Premium', 'Suporte VIP 24h', 'Exportação de Dados']
         }
     ];
 
+    const currentPlan = event.plan;
+    const currentPrice = event.is_paid && currentPlan ? currentPlan.price : 0;
+    
+    const selectedPlanData = plans.find(p => p.id === selectedPlan);
+    const newPrice = selectedPlanData ? selectedPlanData.price : 0;
+    const priceToPay = Math.max(newPrice - currentPrice, 0);
+
     const handlePayment = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (priceToPay <= 0) {
+            toast.error('Você já possui este plano ou um plano superior.');
+            return;
+        }
+
         try {
             const response = await axios.post(route('events.pay', event.id), {
                 plan: selectedPlan
             });
-            
+
             if (response.data.url) {
                 window.location.href = response.data.url;
             }
@@ -69,9 +85,9 @@ export default function Checkout({ event }: { event: Event }) {
 
             <div className="py-12 bg-[#F9F8F6] min-h-screen">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    
-                    <Link 
-                        href={route('events.show', event.id)} 
+
+                    <Link
+                        href={route('events.show', event.id)}
                         className="inline-flex items-center gap-2 text-stone-400 hover:text-[#0A0A0A] transition-all mb-12 font-black uppercase text-[10px] tracking-widest group"
                     >
                         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -79,44 +95,55 @@ export default function Checkout({ event }: { event: Event }) {
                     </Link>
 
                     <div className="grid lg:grid-cols-12 gap-16 items-start">
-                        
+
                         {/* Plans Selection */}
                         <div className="lg:col-span-8 space-y-12">
                             <div className="grid sm:grid-cols-3 gap-6">
-                                {plans.map((plan) => (
-                                    <button
-                                        key={plan.id}
-                                        onClick={() => setSelectedPlan(plan.id)}
-                                        className={`relative p-8 rounded-[3rem] border-2 text-left transition-all ambient-shadow group ${
-                                            selectedPlan === plan.id 
-                                            ? 'border-[#0A0A0A] bg-white shadow-2xl scale-[1.02]' 
-                                            : 'border-stone-100 bg-white/50 hover:border-stone-200'
-                                        }`}
-                                    >
-                                        {selectedPlan === plan.id && (
-                                            <div className="absolute -top-3 -right-3 w-10 h-10 bg-[#D4AF37] text-white rounded-full flex items-center justify-center shadow-xl z-10 border-4 border-white">
-                                                <Check className="w-5 h-5 stroke-[3px]" />
+                                {plans.map((plan) => {
+                                    const isCurrent = currentPlan?.slug === plan.id;
+                                    const isDowngrade = plan.price <= currentPrice;
+
+                                    return (
+                                        <button
+                                            key={plan.id}
+                                            disabled={isCurrent || isDowngrade}
+                                            onClick={() => setSelectedPlan(plan.id)}
+                                            className={`relative p-8 rounded-[3rem] border-2 text-left transition-all ambient-shadow group ${selectedPlan === plan.id
+                                                    ? 'border-[#0A0A0A] bg-white shadow-2xl scale-[1.02]'
+                                                    : 'border-stone-100 bg-white/50 hover:border-stone-200'
+                                                } ${(isCurrent || isDowngrade) ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
+                                        >
+                                            {isCurrent && (
+                                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0A0A0A] text-white text-[8px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full z-20 border-2 border-white shadow-lg">
+                                                    Plano Atual
+                                                </div>
+                                            )}
+                                            
+                                            {selectedPlan === plan.id && (
+                                                <div className="absolute -top-3 -right-3 w-10 h-10 bg-[#D4AF37] text-white rounded-full flex items-center justify-center shadow-xl z-10 border-4 border-white">
+                                                    <Check className="w-5 h-5 stroke-[3px]" />
+                                                </div>
+                                            )}
+                                            <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-4 ${selectedPlan === plan.id ? 'text-[#D4AF37]' : 'text-stone-400'}`}>
+                                                {plan.name}
+                                            </p>
+                                            <div className="flex items-baseline gap-1 mb-6">
+                                                <span className="text-xs font-black text-stone-400">R$</span>
+                                                <span className="text-4xl font-serif font-black text-[#0A0A0A]">{plan.price}</span>
                                             </div>
-                                        )}
-                                        <p className={`text-[10px] font-black uppercase tracking-[0.2em] mb-4 ${selectedPlan === plan.id ? 'text-[#D4AF37]' : 'text-stone-400'}`}>
-                                            {plan.name}
-                                        </p>
-                                        <div className="flex items-baseline gap-1 mb-6">
-                                            <span className="text-xs font-black text-stone-400">R$</span>
-                                            <span className="text-4xl font-serif font-black text-[#0A0A0A]">{plan.price}</span>
-                                        </div>
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-3 py-3 border-t border-stone-50">
-                                                <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
-                                                <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider">{plan.guests} convidados</span>
+                                            <div className="space-y-4">
+                                                <div className="flex items-center gap-3 py-3 border-t border-stone-50">
+                                                    <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full" />
+                                                    <span className="text-[10px] font-bold text-stone-600 uppercase tracking-wider">{plan.guests} convidados</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </button>
-                                ))}
+                                        </button>
+                                    );
+                                })}
                             </div>
 
                             {/* Payment Redirect Info */}
-                            <motion.div 
+                            <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="bg-white rounded-[4rem] p-12 sm:p-20 border border-stone-100 shadow-2xl text-center relative overflow-hidden"
@@ -128,7 +155,7 @@ export default function Checkout({ event }: { event: Event }) {
                                 <div className="w-24 h-24 bg-[#0A0A0A] text-[#D4AF37] rounded-3xl flex items-center justify-center mx-auto mb-10 shadow-2xl rotate-3">
                                     <Lock className="w-10 h-10" />
                                 </div>
-                                
+
                                 <h3 className="text-3xl font-serif text-[#0A0A0A] mb-4 font-black">Checkout Premium</h3>
                                 <p className="text-stone-500 mb-12 max-w-md mx-auto leading-relaxed">
                                     Finalize sua ativação através do ambiente criptografado do <span className="font-black text-[#0A0A0A]">Stripe</span>. Aceitamos cartões internacionais e PIX.
@@ -156,7 +183,7 @@ export default function Checkout({ event }: { event: Event }) {
                                         </>
                                     )}
                                 </button>
-                                
+
                                 <div className="mt-12 flex items-center justify-center gap-4 text-stone-300">
                                     <ShieldCheck className="w-5 h-5" />
                                     <span className="text-[10px] font-black uppercase tracking-widest italic">Criptografia de ponta a ponta</span>
@@ -168,24 +195,35 @@ export default function Checkout({ event }: { event: Event }) {
                         <div className="lg:col-span-4 space-y-8">
                             <div className="bg-[#0A0A0A] text-white p-10 rounded-[3.5rem] shadow-2xl relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4AF37]/10 rounded-full filter blur-3xl -translate-y-1/2 translate-x-1/2" />
-                                
+
                                 <div className="flex items-center gap-3 mb-10">
                                     <Sparkles className="w-6 h-6 text-[#D4AF37]" />
                                     <h3 className="font-serif text-3xl font-black">Resumo</h3>
                                 </div>
-                                
+
                                 <div className="space-y-6 mb-10 pb-10 border-b border-white/10">
                                     <div className="flex justify-between items-center">
                                         <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Plano</span>
-                                        <span className="font-black text-[#D4AF37] uppercase text-[10px] tracking-widest">{plans.find(p => p.id === selectedPlan)?.name}</span>
+                                        <span className="text-white font-serif text-xl font-black">{selectedPlanData?.name}</span>
                                     </div>
+
+                                    {currentPrice > 0 && (
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Valor do Plano</span>
+                                            <span className="text-white/60 line-through">R$ {newPrice.toFixed(2)}</span>
+                                        </div>
+                                    )}
+
+                                    {currentPrice > 0 && (
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Crédito Anterior</span>
+                                            <span className="text-green-400">- R$ {currentPrice.toFixed(2)}</span>
+                                        </div>
+                                    )}
+                                    
                                     <div className="flex justify-between items-center">
-                                        <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Preço</span>
-                                        <span className="font-serif text-2xl font-black">R$ {plans.find(p => p.id === selectedPlan)?.price}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center pt-6">
-                                        <span className="font-serif text-3xl font-black">Total</span>
-                                        <span className="font-serif text-3xl font-black text-[#D4AF37]">R$ {plans.find(p => p.id === selectedPlan)?.price}</span>
+                                        <span className="text-white/40 font-bold uppercase text-[10px] tracking-widest">A Pagar</span>
+                                        <span className="text-[#D4AF37] font-serif text-3xl font-black italic">R$ {priceToPay.toFixed(2)}</span>
                                     </div>
                                 </div>
 
@@ -200,7 +238,7 @@ export default function Checkout({ event }: { event: Event }) {
                                 </div>
                             </div>
 
-                            <motion.div 
+                            <motion.div
                                 whileHover={{ scale: 1.02 }}
                                 className="p-8 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-[2.5rem] flex gap-5 items-start relative overflow-hidden group"
                             >
@@ -216,7 +254,7 @@ export default function Checkout({ event }: { event: Event }) {
                 </div>
             </div>
 
-            <ConfirmModal 
+            <ConfirmModal
                 show={isConfirmModalOpen}
                 onClose={() => setIsConfirmModalOpen(false)}
                 onConfirm={() => {

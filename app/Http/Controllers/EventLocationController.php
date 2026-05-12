@@ -18,6 +18,10 @@ class EventLocationController extends Controller
             return back()->with('error', 'Este evento não pode mais ser editado (limite de 2 dias após o evento).');
         }
 
+        if (!$event->canAccessFeature('multi_location') && $event->locations()->count() >= 1) {
+            return back()->with('error', 'Seu plano permite apenas 1 local. Faça o upgrade para adicionar múltiplos locais.');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'address' => 'required|string|max:500',

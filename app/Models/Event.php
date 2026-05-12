@@ -83,13 +83,30 @@ class Event extends Model
         return now()->lte($this->event_date->addDays(2));
     }
 
+    public function canAccessFeature(string $feature): bool
+    {
+        // If not paid, only allow basic features for preview
+        if (!$this->is_paid) {
+            return in_array($feature, ['rsvp', 'map']);
+        }
+
+        if (!$this->plan) {
+            return false;
+        }
+
+        return in_array($feature, $this->plan->features ?? []);
+    }
+
     public function hasAccess(): bool
     {
-        // Must be paid and within 3 months after the event date
+        // Must be paid
         if (!$this->is_paid) {
             return false;
         }
 
-        return now()->lte($this->event_date->addMonths(3));
+        // If no plan is associated, default to 3 months (safety)
+        $durationMonths = $this->plan ? $this->plan->duration_months : 3;
+
+        return now()->lte($this->event_date->addMonths($durationMonths));
     }
 }

@@ -26,9 +26,9 @@ interface InvitationViewProps {
         theme?: string;
         rsvp_enabled?: boolean;
         rsvp_deadline?: string | null;
-        slug: string;
         allow_extra_guests?: boolean;
         max_extra_guests?: number;
+        can_access_mural?: boolean;
     };
     locations: Array<{
         id: number;
@@ -183,7 +183,7 @@ export default function InvitationView({ event, locations, notices, guides, gues
             )}
 
             {/* Floating Feed Button */}
-            {isAnimationFinished && (
+            {isAnimationFinished && event.can_access_mural && (
                 <motion.div 
                     initial={{ opacity: 0, x: 100 }}
                     animate={{ opacity: 1, x: 0 }}

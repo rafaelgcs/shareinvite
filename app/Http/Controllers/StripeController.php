@@ -15,14 +15,24 @@ class StripeController extends Controller
             abort(403);
         }
 
-        $plan = $request->plan ?: 'premium';
-        $prices = [
-            'classic' => 4900, // R$ 49.00
-            'premium' => 9900, // R$ 99.00
-            'luxury' => 19900, // R$ 199.00
-        ];
+        $planModel = \App\Models\Plan::where('slug', $request->plan)->first();
+        
+        if (!$planModel) {
+            $planModel = \App\Models\Plan::where('slug', 'premium')->first();
+        }
 
-        $price = $prices[$plan] ?? 9900;
+        $newPrice = $planModel->price;
+        $currentPrice = $event->is_paid && $event->plan ? $event->plan->price : 0;
+        
+        $priceToPay = $newPrice - $currentPrice;
+
+        if ($priceToPay <= 0) {
+            return response()->json([
+                'message' => 'Você já possui este plano ou um plano superior.'
+            ], 422);
+        }
+
+        $price = (int)($priceToPay * 100);
 
         Stripe::setApiKey(config('services.stripe.secret'));
 
@@ -33,8 +43,10 @@ class StripeController extends Controller
                 'price_data' => [
                     'currency' => 'brl',
                     'product_data' => [
-                        'name' => "Plano " . ucfirst($plan) . " - " . $event->title,
-                        'description' => "Ativação de convite digital premium.",
+                        'name' => ($currentPrice > 0 ? "Upgrade para " : "Plano ") . ($planModel->name ?? 'Premium') . " - " . $event->title,
+                        'description' => $currentPrice > 0 
+                            ? "Upgrade de plano com desconto do valor já pago."
+                            : "Ativação de convite digital premium.",
                     ],
                     'unit_amount' => $price,
                 ],
@@ -45,7 +57,7 @@ class StripeController extends Controller
             'cancel_url' => route('events.checkout', $event->id),
             'metadata' => [
                 'event_id' => $event->id,
-                'plan' => $plan,
+                'plan_slug' => $planModel->slug,
             ],
         ]);
 
@@ -66,9 +78,13 @@ class StripeController extends Controller
 
         // Mock payment for development/demo
         if ($sessionId === 'mock_session') {
+            $planSlug = $request->get('plan');
+            $planModel = \App\Models\Plan::where('slug', $planSlug)->first();
+
             $event->update([
                 'is_paid' => true,
-                'status' => 'active'
+                'status' => 'active',
+                'plan_id' => $planModel?->id,
             ]);
             return redirect()->route('dashboard')->with('success', 'Pagamento confirmado! Seu convite foi liberado (Modo de Teste).');
         }
@@ -79,9 +95,13 @@ class StripeController extends Controller
             $session = Session::retrieve($sessionId);
 
             if ($session->payment_status === 'paid') {
+                $planSlug = $session->metadata->plan_slug ?? 'premium';
+                $planModel = \App\Models\Plan::where('slug', $planSlug)->first();
+
                 $event->update([
                     'is_paid' => true,
-                    'status' => 'active'
+                    'status' => 'active',
+                    'plan_id' => $planModel?->id,
                 ]);
 
                 return redirect()->route('dashboard')->with('success', 'Pagamento confirmado! Seu convite foi liberado.');
@@ -117,9 +137,13 @@ class StripeController extends Controller
             if ($eventId) {
                 $eventModel = Event::find($eventId);
                 if ($eventModel) {
+                    $planSlug = $session->metadata->plan_slug ?? 'premium';
+                    $planModel = \App\Models\Plan::where('slug', $planSlug)->first();
+
                     $eventModel->update([
                         'is_paid' => true,
-                        'status' => 'active'
+                        'status' => 'active',
+                        'plan_id' => $planModel?->id,
                     ]);
 
                     if ($eventModel->user) {

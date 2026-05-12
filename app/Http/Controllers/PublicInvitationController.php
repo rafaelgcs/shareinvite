@@ -47,6 +47,7 @@ class PublicInvitationController extends Controller
                 'allow_extra_guests' => $event->allow_extra_guests,
                 'max_extra_guests' => $event->max_extra_guests,
                 'slug' => $event->slug,
+                'can_access_mural' => $event->canAccessFeature('mural'),
             ],
             'locations' => $event->locations,
             'notices' => $event->notices,
@@ -74,6 +75,10 @@ class PublicInvitationController extends Controller
         $event = Event::where('slug', $slug)->firstOrFail();
 
         if (!$event->hasAccess()) {
+            return redirect()->route('invitation.show', $slug);
+        }
+
+        if (!$event->canAccessFeature('mural')) {
             return redirect()->route('invitation.show', $slug);
         }
         $posts = $event->posts()
