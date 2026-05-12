@@ -14,35 +14,40 @@ interface RsvpFormProps {
     };
     allowExtraGuests?: boolean;
     maxExtraGuests?: number;
+    guest?: any;
 }
 
-export default function RsvpForm({ eventId, event, allowExtraGuests = true, maxExtraGuests = 5 }: RsvpFormProps) {
+export default function RsvpForm({ 
+    eventId, 
+    event, 
+    allowExtraGuests = true, 
+    maxExtraGuests = 5,
+    guest = null
+}: RsvpFormProps) {
     const ticketRef = useRef<HTMLDivElement>(null);
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [extraGuests, setExtraGuests] = useState(0);
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [message, setMessage] = useState('');
-    const [guestData, setGuestData] = useState<any>(null);
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(guest?.confirmed_at ? 'success' : 'idle');
+    const [message, setMessage] = useState(guest?.confirmed_at ? 'Você já confirmou sua presença.' : '');
+    const [guestData, setGuestData] = useState<any>(guest);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('loading');
 
         try {
-            const response = await fetch(`/api/events/${eventId}/rsvp`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                },
-                body: JSON.stringify({ name, email, phone, extra_guests: extraGuests }),
+            const response = await window.axios.post(`/rsvp/${eventId}`, {
+                name,
+                email,
+                phone,
+                extra_guests: extraGuests
             });
 
-            const data = await response.json();
+            const data = response.data;
 
-            if (response.ok) {
+            if (response.status === 200 || response.status === 201) {
                 setStatus('success');
                 setMessage(data.message);
                 setGuestData(data.guest);
@@ -50,6 +55,16 @@ export default function RsvpForm({ eventId, event, allowExtraGuests = true, maxE
                 setEmail('');
                 setPhone('');
                 setExtraGuests(0);
+                
+                // Also persist locally as a backup
+                if (data.guest) {
+                    localStorage.setItem(`miu_guest_confirmed_${eventId}`, 'true');
+                    // Ensure it's marked as opened too
+                    if (event?.title) {
+                        const slug = window.location.pathname.split('/').pop();
+                        if (slug) localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+                    }
+                }
             } else {
                 setStatus('error');
                 setMessage(data.message || 'Ocorreu um erro ao confirmar.');

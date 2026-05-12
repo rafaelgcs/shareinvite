@@ -1,4 +1,5 @@
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import EnvelopeAnimation from '@/Components/Invitation/EnvelopeAnimation';
 import NoticeModal from '@/Components/Invitation/NoticeModal';
 import { Head, Link } from '@inertiajs/react';
@@ -26,6 +27,8 @@ interface InvitationViewProps {
         rsvp_enabled?: boolean;
         rsvp_deadline?: string | null;
         slug: string;
+        allow_extra_guests?: boolean;
+        max_extra_guests?: number;
     };
     locations: Array<{
         id: number;
@@ -47,9 +50,23 @@ interface InvitationViewProps {
         type: string;
         file_path?: string | null;
     }>;
+    guest?: any;
 }
 
-export default function InvitationView({ event, locations, notices, guides }: InvitationViewProps) {
+export default function InvitationView({ event, locations, notices, guides, guest = null }: InvitationViewProps) {
+    const [isAnimationFinished, setIsAnimationFinished] = useState(false);
+    const [skipAnimation, setSkipAnimation] = useState(false);
+
+    useEffect(() => {
+        // Check if user has already opened the invitation and confirmed
+        const hasOpened = localStorage.getItem(`miu_invites_opened_${event.slug}`) === 'true';
+        const isConfirmed = !!guest?.confirmed_at || localStorage.getItem(`miu_guest_confirmed_${event.id}`) === 'true';
+        
+        if (hasOpened && isConfirmed) {
+            setSkipAnimation(true);
+        }
+    }, [event.slug, event.id, guest]);
+
     const primaryColor = event.primary_color || '#1c1917';
     const secondaryColor = event.secondary_color || '#fafaf9';
     const textColor = event.text_color || '#1c1917';
@@ -60,16 +77,16 @@ export default function InvitationView({ event, locations, notices, guides }: In
     const renderTheme = () => {
         switch (theme) {
             case 'modern':
-                return <ModernTheme event={event} locations={locations} guides={guides} />;
+                return <ModernTheme event={event} locations={locations} guides={guides} guest={guest} />;
             case 'floral':
-                return <FloralTheme event={event} locations={locations} guides={guides} />;
+                return <FloralTheme event={event} locations={locations} guides={guides} guest={guest} />;
             case 'dark':
-                return <DarkTheme event={event} locations={locations} guides={guides} />;
+                return <DarkTheme event={event} locations={locations} guides={guides} guest={guest} />;
             case 'vintage':
-                return <VintageTheme event={event} locations={locations} guides={guides} />;
+                return <VintageTheme event={event} locations={locations} guides={guides} guest={guest} />;
             case 'classic':
             default:
-                return <ClassicTheme event={event} locations={locations} guides={guides} />;
+                return <ClassicTheme event={event} locations={locations} guides={guides} guest={guest} />;
         }
     };
 
@@ -92,6 +109,9 @@ export default function InvitationView({ event, locations, notices, guides }: In
                 backgroundColor={backgroundColor}
                 logo={event.logo}
                 title={event.title}
+                initialOpened={skipAnimation}
+                onComplete={setIsAnimationFinished}
+                slug={event.slug}
             >
                 <NoticeModal notices={notices} />
 
@@ -126,7 +146,7 @@ export default function InvitationView({ event, locations, notices, guides }: In
             </EnvelopeAnimation>
 
             {/* Floating RSVP Button */}
-            {event.rsvp_enabled && (
+            {event.rsvp_enabled && isAnimationFinished && !guest?.confirmed_at && (
                 <motion.div 
                     initial={{ opacity: 0, y: 100 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -163,19 +183,21 @@ export default function InvitationView({ event, locations, notices, guides }: In
             )}
 
             {/* Floating Feed Button */}
-            <motion.div 
-                initial={{ opacity: 0, x: 100 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3"
-            >
-                <Link 
-                    href={route('invitation.feed', event.slug)}
-                    className="w-14 h-14 bg-white/80 backdrop-blur-md text-stone-900 rounded-full shadow-2xl flex items-center justify-center border border-stone-200 hover:scale-110 active:scale-95 transition-all group pointer-events-auto"
+            {isAnimationFinished && (
+                <motion.div 
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="fixed bottom-28 right-6 z-50 flex flex-col items-end gap-3"
                 >
-                    <Camera className="w-6 h-6" />
-                    <span className="absolute right-16 bg-stone-900 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Mural de Fotos</span>
-                </Link>
-            </motion.div>
+                    <Link 
+                        href={route('invitation.feed', event.slug)}
+                        className="w-14 h-14 bg-white/80 backdrop-blur-md text-stone-900 rounded-full shadow-2xl flex items-center justify-center border border-stone-200 hover:scale-110 active:scale-95 transition-all group pointer-events-auto"
+                    >
+                        <Camera className="w-6 h-6" />
+                        <span className="absolute right-16 bg-stone-900 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">Mural de Fotos</span>
+                    </Link>
+                </motion.div>
+            )}
         </div>
     );
 }

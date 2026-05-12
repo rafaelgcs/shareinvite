@@ -7,9 +7,10 @@ interface ThemeProps {
     event: any;
     locations: any[];
     guides?: any[];
+    guest?: any;
 }
 
-export default function ClassicTheme({ event, locations, guides = [] }: ThemeProps) {
+export default function ClassicTheme({ event, locations, guides = [], guest = null }: ThemeProps) {
 
     const defaultCover = "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=2000&auto=format&fit=crop";
 
@@ -137,6 +138,7 @@ export default function ClassicTheme({ event, locations, guides = [] }: ThemePro
                         event={event}
                         allowExtraGuests={event.allow_extra_guests} 
                         maxExtraGuests={event.max_extra_guests} 
+                        guest={guest}
                     />
                 </motion.div>
             </section>

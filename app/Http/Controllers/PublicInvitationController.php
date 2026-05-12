@@ -23,6 +23,11 @@ class PublicInvitationController extends Controller
             ]);
         }
 
+        $guest = null;
+        if (session('guest_id')) {
+            $guest = Guest::find(session('guest_id'));
+        }
+
         return Inertia::render('Public/InvitationView', [
             'event' => [
                 'id' => $event->id,
@@ -45,6 +50,11 @@ class PublicInvitationController extends Controller
             'locations' => $event->locations,
             'notices' => $event->notices,
             'guides' => $event->guides,
+            'guest' => $guest ? [
+                'id' => $guest->id,
+                'name' => $guest->name,
+                'confirmed_at' => $guest->confirmed_at,
+            ] : null,
         ]);
     }
 

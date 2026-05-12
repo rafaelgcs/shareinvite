@@ -64,3 +64,4 @@ Route::get('/g/{uuid}', [PublicInvitationController::class, 'guestLogin'])->name
 Route::get('/{slug}', [PublicInvitationController::class, 'show'])->name('invitation.show');
 Route::get('/{slug}/feed', [PublicInvitationController::class, 'feed'])->name('invitation.feed');
 Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
+Route::post('/rsvp/{event}', [\App\Http\Controllers\Api\RsvpController::class, 'store'])->name('rsvp.store');

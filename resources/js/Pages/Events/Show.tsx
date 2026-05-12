@@ -7,7 +7,8 @@ import {
     Palette, Trash2, BookOpen, ShieldCheck, CheckCircle, Clock,
     Share2, Download, X, FileText, Upload, Search, ChevronUp,
     ChevronDown, ArrowUpDown, Filter, Sparkles, LayoutDashboard,
-    Zap
+    Zap,
+    ArrowRight
 } from 'lucide-react';
 import Modal from '@/Components/Modal';
 import DigitalTicket from '@/Components/Invitation/DigitalTicket';
@@ -199,8 +200,8 @@ export default function Show({ event }: { event: Event }) {
                     <div className="space-y-4">
                         <div className="flex flex-wrap items-center gap-3">
                             <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${event.status === 'active'
-                                    ? 'bg-green-100 text-green-700 border border-green-200'
-                                    : 'bg-stone-200 text-stone-600 border border-stone-300'
+                                ? 'bg-green-100 text-green-700 border border-green-200'
+                                : 'bg-stone-200 text-stone-600 border border-stone-300'
                                 }`}>
                                 {event.status === 'active' ? 'Evento Ativo' : 'Rascunho'}
                             </span>
@@ -221,15 +222,6 @@ export default function Show({ event }: { event: Event }) {
                             <ShieldCheck className="w-5 h-5 text-[#D4AF37]" />
                             Scanner de Entrada
                         </Link>
-                        {!event.is_paid && (
-                            <Link
-                                href={route('events.checkout', event.id)}
-                                className="premium-button flex items-center justify-center gap-3 bg-[#D4AF37] text-white px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-[#D4AF37]/30 w-full sm:w-auto hover:bg-[#0A0A0A] transition-all"
-                            >
-                                <Zap className="w-5 h-5 fill-white" />
-                                Ativar Convite
-                            </Link>
-                        )}
                         <Link
                             href={`/${event.slug}`}
                             target="_blank"
@@ -257,8 +249,8 @@ export default function Show({ event }: { event: Event }) {
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-3 px-8 py-4 rounded-[1.5rem] text-sm font-black transition-all duration-300 whitespace-nowrap ${isActive
-                                            ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/10 scale-105 z-10'
-                                            : 'text-stone-500 hover:text-[#0A0A0A] hover:bg-stone-50'
+                                        ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/10 scale-105 z-10'
+                                        : 'text-stone-500 hover:text-[#0A0A0A] hover:bg-stone-50'
                                         }`}
                                 >
                                     <Icon className={`w-4 h-4 ${isActive ? 'text-[#D4AF37]' : 'text-stone-400'}`} />
@@ -378,8 +370,8 @@ export default function Show({ event }: { event: Event }) {
                                                                 type="button"
                                                                 onClick={() => setDesignData({ ...designData, primary_color: palette.p, secondary_color: palette.s, text_color: palette.t, background_color: palette.b })}
                                                                 className={`group flex items-center gap-3 px-5 py-3 rounded-2xl border-2 transition-all shadow-sm hover:shadow-lg ${designData.primary_color.toLowerCase() === palette.p.toLowerCase()
-                                                                        ? 'border-[#0A0A0A] bg-stone-50 ring-1 ring-[#0A0A0A]/5'
-                                                                        : 'border-stone-100 bg-white hover:border-stone-200'
+                                                                    ? 'border-[#0A0A0A] bg-stone-50 ring-1 ring-[#0A0A0A]/5'
+                                                                    : 'border-stone-100 bg-white hover:border-stone-200'
                                                                     }`}
                                                             >
                                                                 <div className="flex -space-x-2">
@@ -492,8 +484,8 @@ export default function Show({ event }: { event: Event }) {
                                                             key={theme.id}
                                                             onClick={() => setDesignData('theme', theme.id)}
                                                             className={`p-6 rounded-[2rem] border-2 cursor-pointer transition-all text-center group ${designData.theme === theme.id
-                                                                    ? 'border-[#0A0A0A] bg-stone-50'
-                                                                    : 'border-stone-100 hover:border-stone-200 bg-white'
+                                                                ? 'border-[#0A0A0A] bg-stone-50'
+                                                                : 'border-stone-100 hover:border-stone-200 bg-white'
                                                                 }`}
                                                         >
                                                             <div className={`w-8 h-8 rounded-full mx-auto mb-3 border-4 flex items-center justify-center ${designData.theme === theme.id ? 'border-[#D4AF37] bg-[#0A0A0A]' : 'border-stone-100 bg-stone-50'}`}>
@@ -524,8 +516,8 @@ export default function Show({ event }: { event: Event }) {
                                                         <div
                                                             key={anim.id}
                                                             className={`group p-6 rounded-[2rem] border-2 transition-all flex flex-col gap-4 ${designData.animation_type === anim.id
-                                                                    ? 'border-[#0A0A0A] bg-stone-50'
-                                                                    : 'border-stone-100 hover:border-stone-200 bg-white'
+                                                                ? 'border-[#0A0A0A] bg-stone-50'
+                                                                : 'border-stone-100 hover:border-stone-200 bg-white'
                                                                 }`}
                                                         >
                                                             <div className="flex items-center justify-between">
@@ -666,8 +658,8 @@ export default function Show({ event }: { event: Event }) {
                                                         key={filter.id}
                                                         onClick={() => setStatusFilter(filter.id)}
                                                         className={`flex items-center gap-3 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${statusFilter === filter.id
-                                                                ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/20'
-                                                                : 'text-stone-400 hover:text-[#0A0A0A] hover:bg-stone-50'
+                                                            ? 'bg-[#0A0A0A] text-white shadow-xl shadow-black/20'
+                                                            : 'text-stone-400 hover:text-[#0A0A0A] hover:bg-stone-50'
                                                             }`}
                                                     >
                                                         {filter.label}
@@ -937,10 +929,10 @@ export default function Show({ event }: { event: Event }) {
                                                             animate={{ opacity: 1, scale: 1 }}
                                                             key={notice.id}
                                                             className={`p-8 rounded-[2.5rem] border flex items-start justify-between relative overflow-hidden ${notice.priority === 'urgent'
-                                                                    ? 'bg-[#0A0A0A] border-stone-800 text-white shadow-2xl'
-                                                                    : notice.priority === 'important'
-                                                                        ? 'bg-[#FCFBF8] border-[#D4AF37]/30 text-[#0A0A0A] shadow-lg shadow-[#D4AF37]/5'
-                                                                        : 'bg-white border-stone-100 text-stone-600'
+                                                                ? 'bg-[#0A0A0A] border-stone-800 text-white shadow-2xl'
+                                                                : notice.priority === 'important'
+                                                                    ? 'bg-[#FCFBF8] border-[#D4AF37]/30 text-[#0A0A0A] shadow-lg shadow-[#D4AF37]/5'
+                                                                    : 'bg-white border-stone-100 text-stone-600'
                                                                 }`}
                                                         >
                                                             <div className="flex gap-6 items-start">
@@ -1090,6 +1082,36 @@ export default function Show({ event }: { event: Event }) {
                     </EnvelopeAnimation>
                 </div>
             </Modal>
+            <div className="h-32 lg:h-0" />
+
+            {!event.is_paid && (
+                <motion.div
+                    initial={{ y: 100 }}
+                    animate={{ y: 0 }}
+                    className="fixed bottom-0 inset-x-0 z-[100] p-4 lg:p-8"
+                >
+                    <div className="max-w-4xl mx-auto bg-[#0A0A0A] border border-white/10 backdrop-blur-xl rounded-[2.5rem] p-6 lg:p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative">
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+
+                        <div className="flex items-center gap-6 relative z-10">
+                            <div className="w-16 h-16 bg-[#D4AF37]/10 border border-[#D4AF37]/20 rounded-2xl flex items-center justify-center shrink-0">
+                                <Zap className="w-8 h-8 text-[#D4AF37] fill-[#D4AF37] animate-pulse" />
+                            </div>
+                            <div className="text-center md:text-left">
+                                <h4 className="text-white font-serif text-xl font-black mb-1">Convite em Rascunho</h4>
+                                <p className="text-stone-400 text-xs font-medium max-w-xs uppercase tracking-widest">Este evento ainda não está disponível para seus convidados.</p>
+                            </div>
+                        </div>
+
+                        <Link
+                            href={route('events.checkout', event.id)}
+                            className="w-full md:w-auto bg-[#D4AF37] hover:bg-white text-[#0A0A0A] px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-[#D4AF37]/20 flex items-center justify-center gap-3 group relative z-10"
+                        >
+                            Liberar Agora <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-2" />
+                        </Link>
+                    </div>
+                </motion.div>
+            )}
         </AuthenticatedLayout>
     );
 }

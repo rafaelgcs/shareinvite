@@ -172,31 +172,33 @@ export default function Dashboard({ events }: { events: Event[] }) {
                                                         />
                                                     </div>
                                                 </div>
-
-                                                <div className="flex items-center justify-between pt-6 border-t border-stone-50">
-                                                    <div className="flex flex-col gap-1">
-                                                        <Link
-                                                            href={route('events.show', evt.id)}
-                                                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#0A0A0A] hover:text-[#D4AF37] transition-colors group-link"
+                                                
+                                                <div className="flex flex-col gap-4 pt-6 border-t border-stone-50">
+                                                    <div className="flex items-center justify-between">
+                                                        <Link 
+                                                            href={route('events.show', evt.id)} 
+                                                            className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-[#0A0A0A] transition-colors group-link"
                                                         >
-                                                            Gerenciar Evento
+                                                            Configurações
                                                             <ArrowRight className="w-3 h-3 transition-transform group-hover-link:translate-x-1" />
                                                         </Link>
-                                                        {!evt.is_paid && (
-                                                            <Link
-                                                                href={route('events.checkout', evt.id)}
-                                                                className="flex items-center gap-1.5 text-[9px] font-black text-[#D4AF37] uppercase tracking-widest hover:text-[#0A0A0A] transition-colors"
-                                                            >
-                                                                <Zap className="w-2.5 h-2.5 fill-[#D4AF37]" /> Ativar Convite
-                                                            </Link>
-                                                        )}
+                                                        
+                                                        <div className="flex -space-x-2">
+                                                            {[1, 2, 3].map(i => (
+                                                                <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-stone-200" />
+                                                            ))}
+                                                        </div>
                                                     </div>
 
-                                                    <div className="flex -space-x-2">
-                                                        {[1, 2, 3].map(i => (
-                                                            <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-stone-200" />
-                                                        ))}
-                                                    </div>
+                                                    {!evt.is_paid && (
+                                                        <Link 
+                                                            href={route('events.checkout', evt.id)}
+                                                            className="w-full bg-[#D4AF37] hover:bg-[#0A0A0A] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#D4AF37]/20 flex items-center justify-center gap-2 group/btn"
+                                                        >
+                                                            <Zap className="w-4 h-4 fill-white group-hover/btn:scale-125 transition-transform" />
+                                                            Liberar Convite Agora
+                                                        </Link>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

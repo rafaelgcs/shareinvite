@@ -48,6 +48,9 @@ class RsvpController extends Controller
             'confirmed_at' => now(),
         ]);
 
+        // Store guest info in session
+        session(['guest_id' => $guest->id, 'guest_name' => $guest->name]);
+
         return response()->json([
             'message' => 'Presença confirmada com sucesso!',
             'guest' => $guest,

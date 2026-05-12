@@ -11,6 +11,9 @@ interface EnvelopeProps {
     logo?: string | null;
     title?: string;
     isPreview?: boolean;
+    initialOpened?: boolean;
+    onComplete?: (completed: boolean) => void;
+    slug?: string;
 }
 
 export default function EnvelopeAnimation({ 
@@ -22,12 +25,31 @@ export default function EnvelopeAnimation({
     backgroundColor = '#ffffff',
     logo,
     title,
-    isPreview = false
+    isPreview = false,
+    initialOpened = false,
+    onComplete,
+    slug
 }: EnvelopeProps) {
     // isOpened means the user clicked it. It triggers the physical animation (doors opening, flap opening).
-    const [isOpened, setIsOpened] = useState(false);
+    const [isOpened, setIsOpened] = useState(initialOpened);
     // isFinished means the physical animation is done and we can show the actual invitation content.
-    const [isFinished, setIsFinished] = useState(false);
+    const [isFinished, setIsFinished] = useState(initialOpened);
+
+    useEffect(() => {
+        if (initialOpened) {
+            setIsOpened(true);
+            setIsFinished(true);
+            if (slug && !isPreview) {
+                localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+            }
+        }
+    }, [initialOpened, slug, isPreview]);
+
+    useEffect(() => {
+        if (isFinished && onComplete) {
+            onComplete(true);
+        }
+    }, [isFinished, onComplete]);
 
     // Auto-open logic for fade/seal
     useEffect(() => {
@@ -57,6 +79,9 @@ export default function EnvelopeAnimation({
     const handleOpen = () => {
         if (!isOpened) {
             setIsOpened(true);
+            if (slug && !isPreview) {
+                localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+            }
         }
     };
 
