@@ -16,7 +16,7 @@ export default function Dashboard({ events }: { events: Event[] }) {
                         <h2 className="font-serif text-4xl text-[#0A0A0A] tracking-tight leading-none mb-2">
                             Seu Espaço Criativo
                         </h2>
-                        <p className="text-stone-500 font-medium">Gerencie seus eventos de alta papelaria com elegância.</p>
+                        <p className="text-stone-500 font-medium">Gerencie convites para seus eventos com elegância.</p>
                     </div>
                     <Link
                         href={route('events.create')}
@@ -172,17 +172,17 @@ export default function Dashboard({ events }: { events: Event[] }) {
                                                         />
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div className="flex flex-col gap-4 pt-6 border-t border-stone-50">
                                                     <div className="flex items-center justify-between">
-                                                        <Link 
-                                                            href={route('events.show', evt.id)} 
+                                                        <Link
+                                                            href={route('events.show', evt.id)}
                                                             className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-stone-400 hover:text-[#0A0A0A] transition-colors group-link"
                                                         >
                                                             Configurações
                                                             <ArrowRight className="w-3 h-3 transition-transform group-hover-link:translate-x-1" />
                                                         </Link>
-                                                        
+
                                                         <div className="flex -space-x-2">
                                                             {[1, 2, 3].map(i => (
                                                                 <div key={i} className="w-7 h-7 rounded-full border-2 border-white bg-stone-200" />
@@ -191,7 +191,7 @@ export default function Dashboard({ events }: { events: Event[] }) {
                                                     </div>
 
                                                     {!evt.is_paid && (
-                                                        <Link 
+                                                        <Link
                                                             href={route('events.checkout', evt.id)}
                                                             className="w-full bg-[#D4AF37] hover:bg-[#0A0A0A] text-white py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all shadow-xl shadow-[#D4AF37]/20 flex items-center justify-center gap-2 group/btn"
                                                         >

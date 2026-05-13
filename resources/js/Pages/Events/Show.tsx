@@ -273,8 +273,8 @@ export default function Show({ event }: { event: Event }) {
                                 }
                             }}
                             className={`premium-button flex items-center justify-center gap-3 px-8 py-4 rounded-2xl text-sm font-black shadow-xl shadow-black/10 w-full sm:w-auto transition-all ${canAccessFeature('scanner')
-                                    ? 'bg-[#0A0A0A] text-white hover:scale-105'
-                                    : 'bg-stone-100 text-stone-400 cursor-not-allowed opacity-60'
+                                ? 'bg-[#0A0A0A] text-white hover:scale-105'
+                                : 'bg-stone-100 text-stone-400 cursor-not-allowed opacity-60'
                                 }`}
                         >
                             {canAccessFeature('scanner') ? (
@@ -461,7 +461,7 @@ export default function Show({ event }: { event: Event }) {
                                                     <Palette className="w-6 h-6 text-[#D4AF37]" />
                                                     <h3 className="font-serif text-3xl text-[#0A0A0A] font-black tracking-tight">Identidade Visual</h3>
                                                 </div>
-                                                <p className="text-stone-500 mb-10 max-w-2xl">Configure a paleta de cores e o tema que darão vida ao seu convite digital de alta papelaria.</p>
+                                                <p className="text-stone-500 mb-10 max-w-2xl">Configure a paleta de cores e o tema que darão vida ao seu convite digital.</p>
 
                                                 {/* Combinações Sugeridas */}
                                                 <div className="mb-12">
