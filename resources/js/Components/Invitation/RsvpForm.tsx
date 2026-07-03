@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import html2canvas from 'html2canvas';
 import { Download, Share2 } from 'lucide-react';
 import DigitalTicket from './DigitalTicket';
+import { isEventConfirmedLocally, markEventConfirmed, markInvitationOpened } from '@/Utils/rsvpStorage';
 
 interface RsvpFormProps {
     eventId: number;
@@ -29,9 +30,34 @@ export default function RsvpForm({
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
     const [extraGuests, setExtraGuests] = useState(0);
-    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(guest?.confirmed_at ? 'success' : 'idle');
-    const [message, setMessage] = useState(guest?.confirmed_at ? 'Você já confirmou sua presença.' : '');
+    
+    // Check if already confirmed from server or localStorage
+    const isAlreadyConfirmed = () => {
+        if (guest?.confirmed_at) return true;
+        if (!eventId) {
+            console.warn('RsvpForm: eventId is not defined');
+            return false;
+        }
+        return isEventConfirmedLocally(eventId);
+    };
+    
+    const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>(isAlreadyConfirmed() ? 'success' : 'idle');
+    const [message, setMessage] = useState(isAlreadyConfirmed() ? 'Você já confirmou sua presença.' : '');
     const [guestData, setGuestData] = useState<any>(guest);
+
+    // Update status when eventId changes (moving between events)
+    useEffect(() => {
+        if (!eventId) return;
+        
+        const alreadyConfirmed = isAlreadyConfirmed();
+        if (alreadyConfirmed) {
+            setStatus('success');
+            setMessage('Você já confirmou sua presença.');
+        } else {
+            setStatus('idle');
+            setMessage('');
+        }
+    }, [eventId]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -57,12 +83,14 @@ export default function RsvpForm({
                 setExtraGuests(0);
                 
                 // Also persist locally as a backup
-                if (data.guest) {
-                    localStorage.setItem(`miu_guest_confirmed_${eventId}`, 'true');
+                if (data.guest && eventId) {
+                    markEventConfirmed(eventId);
                     // Ensure it's marked as opened too
                     if (event?.title) {
                         const slug = window.location.pathname.split('/').pop();
-                        if (slug) localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+                        if (slug) {
+                            markInvitationOpened(slug);
+                        }
                     }
                 }
             } else {

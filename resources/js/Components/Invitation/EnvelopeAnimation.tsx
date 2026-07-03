@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { markInvitationOpened } from '@/Utils/rsvpStorage';
 
 interface EnvelopeProps {
     children: React.ReactNode;
@@ -40,7 +41,7 @@ export default function EnvelopeAnimation({
             setIsOpened(true);
             setIsFinished(true);
             if (slug && !isPreview) {
-                localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+                markInvitationOpened(slug);
             }
         }
     }, [initialOpened, slug, isPreview]);
@@ -80,7 +81,7 @@ export default function EnvelopeAnimation({
         if (!isOpened) {
             setIsOpened(true);
             if (slug && !isPreview) {
-                localStorage.setItem(`miu_invites_opened_${slug}`, 'true');
+                markInvitationOpened(slug);
             }
         }
     };

@@ -9,6 +9,7 @@ import ModernTheme from '@/Components/Themes/ModernTheme';
 import FloralTheme from '@/Components/Themes/FloralTheme';
 import DarkTheme from '@/Components/Themes/DarkTheme';
 import VintageTheme from '@/Components/Themes/VintageTheme';
+import { hasInvitationOpened, isEventConfirmedLocally, getOpenedStorageKey, getRsvpStorageKey } from '@/Utils/rsvpStorage';
 
 // Example props interface coming from Laravel/Inertia
 interface InvitationViewProps {
@@ -59,8 +60,8 @@ export default function InvitationView({ event, locations, notices, guides, gues
 
     useEffect(() => {
         // Check if user has already opened the invitation and confirmed
-        const hasOpened = localStorage.getItem(`miu_invites_opened_${event.slug}`) === 'true';
-        const isConfirmed = !!guest?.confirmed_at || localStorage.getItem(`miu_guest_confirmed_${event.id}`) === 'true';
+        const hasOpened = hasInvitationOpened(event.slug);
+        const isConfirmed = !!guest?.confirmed_at || isEventConfirmedLocally(event.id);
         
         if (hasOpened && isConfirmed) {
             setSkipAnimation(true);
@@ -73,6 +74,9 @@ export default function InvitationView({ event, locations, notices, guides, gues
     const backgroundColor = event.background_color || '#ffffff';
     const animationType = event.animation_type || 'envelope_3d';
     const theme = event.theme || 'classic';
+
+    // Check if event is already confirmed (from server or localStorage)
+    const isEventConfirmed = !!guest?.confirmed_at || isEventConfirmedLocally(event.id);
 
     const renderTheme = () => {
         switch (theme) {
@@ -146,7 +150,7 @@ export default function InvitationView({ event, locations, notices, guides, gues
             </EnvelopeAnimation>
 
             {/* Floating RSVP Button */}
-            {event.rsvp_enabled && isAnimationFinished && !guest?.confirmed_at && (
+            {event.rsvp_enabled && isAnimationFinished && !isEventConfirmed && (
                 <motion.div 
                     initial={{ opacity: 0, y: 100 }}
                     animate={{ opacity: 1, y: 0 }}
