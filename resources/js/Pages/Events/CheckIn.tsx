@@ -75,6 +75,36 @@ export default function CheckIn({ event }: CheckInProps) {
             await scannerRef.current.stop();
         }
         setIsScanning(false);
+
+        if (!decodedText) {
+            setError("QR Code inválido. Tente novamente.");
+            return;
+        } else {
+            setError(null);
+            let _decodedText = decodedText.trim();
+
+            if (_decodedText.startsWith("https://")) {
+                try {
+                    const url = new URL(_decodedText);
+                    const pathSegments = url.pathname.split('/').filter(Boolean);
+                    if (pathSegments.length >= 2 && pathSegments[0] === 'guests') {
+                        _decodedText = pathSegments[1];
+                    } else {
+                        setError("QR Code inválido. Tente novamente.");
+                        return;
+                    }
+                } catch (e) {
+                    setError("QR Code inválido. Tente novamente.");
+                    return;
+                }
+            }
+
+            if (!/^[0-9a-fA-F-]{36}$/.test(_decodedText)) {
+                setError("QR Code inválido. Tente novamente.");
+                return;
+            }
+            
+        }
         handleCheckIn(decodedText);
     }
 
