@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Plus, Users, Calendar, ArrowRight, Sparkles, Trophy, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Event } from '@/types';
+import { formatSimpleDate } from '@/Utils/dateUtils';
 
 export default function Dashboard({ events }: { events: Event[] }) {
     const activeEventsCount = events.filter(e => e.status === 'active').length;
@@ -155,7 +156,7 @@ export default function Dashboard({ events }: { events: Event[] }) {
 
                                                 <p className="text-xs font-bold text-stone-400 flex items-center gap-2 uppercase tracking-wider mb-6">
                                                     <Calendar className="w-3.5 h-3.5 text-[#D4AF37]" />
-                                                    {new Date(evt.date).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
+                                                    {formatSimpleDate(evt.date)}
                                                 </p>
 
                                                 <div className="space-y-2 mb-8 mt-auto">

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
 import { FileText, Image as ImageIcon } from 'lucide-react';
+import { formatEventDate } from '@/Utils/dateUtils';
 
 interface ThemeProps {
     event: any;
@@ -43,9 +44,7 @@ export default function ModernTheme({ event, locations, guides = [], guest = nul
                         </h1>
                         <div className="h-px w-12 bg-stone-300 mb-8" />
                         <p className="text-stone-600 text-lg md:text-xl font-light leading-relaxed mb-4">
-                            {new Date(event.event_date).toLocaleDateString('pt-BR', {
-                                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                            })}
+                            {formatEventDate(event.event_date)}
                         </p>
                     </motion.div>
                 </div>

@@ -5,6 +5,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, XCircle, Loader2, Camera, ShieldCheck, UserCheck, Users, Calendar } from 'lucide-react';
 import axios from 'axios';
+import { formatSimpleDate } from '@/Utils/dateUtils';
 
 interface CheckInProps {
     event: {
@@ -214,7 +215,7 @@ export default function CheckIn({ event }: CheckInProps) {
                                                 <Calendar className="w-5 h-5 text-stone-400 mb-2" />
                                                 <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Data</span>
                                                 <span className="text-sm font-medium text-stone-700">
-                                                    {new Date(event.event_date).toLocaleDateString('pt-BR')}
+                                                        {formatSimpleDate(event.event_date)}
                                                 </span>
                                             </div>
                                             <div className="p-4 bg-stone-50 rounded-2xl border border-stone-100 flex flex-col items-center">
@@ -284,7 +285,7 @@ export default function CheckIn({ event }: CheckInProps) {
                                                     <div className="flex-1">
                                                         <p className="text-[10px] uppercase tracking-widest text-stone-400 font-bold mb-1">Confirmado em</p>
                                                         <p className="font-medium text-stone-700">
-                                                            {new Date(scanResult.guest.confirmed_at).toLocaleDateString('pt-BR')}
+                                                            {formatSimpleDate(scanResult.guest.confirmed_at)}
                                                         </p>
                                                     </div>
                                                 </div>

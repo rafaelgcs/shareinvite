@@ -87,7 +87,7 @@ export default function Show({ event }: { event: Event }) {
     const { data: basicData, setData: setBasicData, put: putBasic, processing: basicProcessing, recentlySuccessful: basicSuccess, errors: basicErrors } = useForm({
         title: event.title,
         slug: event.slug,
-        event_date: event.event_date ? new Date(event.event_date).toISOString().split('T')[0] : '',
+        event_date: getDateInputValue(event.event_date),
     });
 
     const submitBasics = (e) => {
@@ -921,7 +921,7 @@ export default function Show({ event }: { event: Event }) {
                                                                 </td>
                                                                 <td className="px-8 py-6">
                                                                     <div className="flex flex-col">
-                                                                        <span className="text-xs font-black text-[#0A0A0A]">{new Date(guest.confirmed_at).toLocaleDateString('pt-BR')}</span>
+                                                                        <span className="text-xs font-black text-[#0A0A0A]">{formatSimpleDate(guest.confirmed_at)}</span>
                                                                         <span className="text-[10px] text-stone-400 font-medium uppercase tracking-tighter">às {new Date(guest.confirmed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
                                                                     </div>
                                                                 </td>
@@ -1123,7 +1123,7 @@ export default function Show({ event }: { event: Event }) {
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-lg font-medium leading-relaxed">{notice.message}</p>
-                                                                    <p className="mt-3 text-[10px] font-black uppercase tracking-widest opacity-40">Publicado em {new Date(notice.created_at).toLocaleDateString('pt-BR')}</p>
+                                                                    <p className="mt-3 text-[10px] font-black uppercase tracking-widest opacity-40">Publicado em {formatSimpleDate(notice.created_at)}</p>
                                                                 </div>
                                                             </div>
                                                             <button onClick={() => deleteNotice(notice.id)} className="p-2 opacity-40 hover:opacity-100 hover:text-red-500 transition-all">

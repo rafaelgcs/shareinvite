@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Send, X, Heart, MessageSquare, Image as ImageIcon, ArrowLeft, QrCode, Loader2, Upload } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { formatDateTime } from '@/Utils/dateUtils';
 
 function PostItem({ post, guest }) {
     const [showComments, setShowComments] = useState(false);
@@ -48,7 +49,7 @@ function PostItem({ post, guest }) {
                         <div>
                             <p className="text-sm font-bold text-stone-900">{post.guest_name}</p>
                             <p className="text-[10px] text-stone-400 font-medium">
-                                {new Date(post.created_at).toLocaleDateString('pt-BR')} às {new Date(post.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                {formatDateTime(post.created_at)}
                             </p>
                         </div>
                     </div>

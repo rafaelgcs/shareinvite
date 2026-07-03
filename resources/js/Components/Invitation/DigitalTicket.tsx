@@ -1,5 +1,6 @@
 import { useRef, forwardRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { formatSimpleDate } from '@/Utils/dateUtils';
 
 interface DigitalTicketProps {
     guest: {
@@ -66,7 +67,7 @@ const DigitalTicket = forwardRef<HTMLDivElement, DigitalTicketProps>(({ guest, e
                     <div>
                         <p className="text-[9px] uppercase tracking-widest text-stone-400 font-bold mb-1">Data</p>
                         <p className="text-xs font-bold text-stone-800">
-                            {event?.event_date ? new Date(event.event_date).toLocaleDateString('pt-BR') : '-'}
+                            {event?.event_date ? formatSimpleDate(event.event_date) : '-'}
                         </p>
                     </div>
                     <div>

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
 import { FileText, Image as ImageIcon } from 'lucide-react';
+import { formatEventDate } from '@/Utils/dateUtils';
 
 interface ThemeProps {
     event: any;
@@ -48,9 +49,7 @@ export default function DarkTheme({ event, locations, guides = [], guest = null 
                         <div className="h-px w-8 bg-white/30" />
                     </div>
                     <p className="text-white font-light text-xl md:text-2xl">
-                        {new Date(event.event_date).toLocaleDateString('pt-BR', {
-                            day: '2-digit', month: 'long', year: 'numeric'
-                        })}
+                        {formatEventDate(event.event_date)}
                     </p>
                 </motion.div>
             </section>

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
 import { FileText, Image as ImageIcon } from 'lucide-react';
+import { formatEventDate } from '@/Utils/dateUtils';
 
 interface ThemeProps {
     event: any;
@@ -37,9 +38,7 @@ export default function VintageTheme({ event, locations, guides = [], guest = nu
                             {event.title}
                         </h1>
                         <p className="text-2xl md:text-4xl italic text-[#6a6c7c]">
-                            {new Date(event.event_date).toLocaleDateString('pt-BR', {
-                                day: '2-digit', month: 'long', year: 'numeric'
-                            })}
+                            {formatEventDate(event.event_date)}
                         </p>
                     </motion.div>
                 </div>

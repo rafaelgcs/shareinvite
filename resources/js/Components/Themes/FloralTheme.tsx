@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import GoogleMapWidget from '@/Components/Invitation/GoogleMapWidget';
 import RsvpForm from '@/Components/Invitation/RsvpForm';
 import { FileText, Image as ImageIcon } from 'lucide-react';
+import { formatEventDate } from '@/Utils/dateUtils';
 
 interface ThemeProps {
     event: any;
@@ -52,9 +53,7 @@ export default function FloralTheme({ event, locations, guides = [], guest = nul
                     <div className="flex items-center gap-6 mb-10">
                         <div className="h-px w-12 bg-stone-300" />
                         <p className="font-serif italic text-lg md:text-2xl text-stone-600">
-                            {new Date(event.event_date).toLocaleDateString('pt-BR', {
-                                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-                            })}
+                            {formatEventDate(event.event_date)}
                         </p>
                         <div className="h-px w-12 bg-stone-300" />
                     </div>
